@@ -59,6 +59,12 @@
 }
 
 @font-face {
+    font-family: 'SignikaNegative-SemiBold';
+    src: url('fonts/SignikaNegative-SemiBold.ttf') format('truetype');
+}
+
+
+@font-face {
     font-family: 'LEDCalculator';
     src: url('fonts/LEDCalculator.ttf') format('truetype');
 }
@@ -434,6 +440,7 @@ text-field.flexbox div {
     position: relative;
     font-size: 14px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 /*-----------------------END LOADING----------------*/
@@ -480,6 +487,7 @@ text-field.flexbox div {
 .scHeadingButton {
     min-width: 30px;
 }
+
 @media (max-width: 800px) {
     .scHeadingButton {
         max-width: calc(100% - 20px);
@@ -496,7 +504,7 @@ text-field.flexbox div {
 
 .IZIPASSTemplate {
     padding: 0;
-    position:relative;
+    position: relative;
 }
 
 .IZIPASSTemplate .categoryContent {
@@ -518,11 +526,11 @@ text-field.flexbox div {
     }
 
     .IZIPASSTemplate .rightHanded {
-        flex-direction : row-reverse;
+        flex-direction: row-reverse;
     }
 
     .IZIPASSTemplate .leftHanded {
-        flex-direction : row;
+        flex-direction: row;
     }
 
     .IZIPASSTemplate .categoryContent .quickAccess {
@@ -530,6 +538,7 @@ text-field.flexbox div {
         align-items: start;
         justify-content: start;
     }
+
     .IZIPASSTemplate .categoryContent .quickAccess.subCategories-pad {
         flex: 1 1 15%;
     }
@@ -538,18 +547,18 @@ text-field.flexbox div {
 
 /*---------------------DEFAULT----------------------------*/
 .productboxIZIPASS {
-    background: #fff ;
+    background: #fff;
     border: 1px solid #dbdada;
     border-radius: 4px;
     padding: 0;
-    min-width:0;
+    min-width: 0;
     width: 150px;
     height: 160px;
     margin: 2px;
 }
 
 .productboxIZIPASS.disabled {
-    background-color : #b5b4b4;
+    background-color: #b5b4b4;
 }
 
 .productboxIZIPASS .link {
@@ -558,16 +567,17 @@ text-field.flexbox div {
 }
 
 .productboxIZIPASS .imageContainer {
-    height:40%;
+    height: 40%;
     margin-bottom: 5px
 }
 
 .productboxIZIPASS .titleRow {
-    height:45%;
+    height: 45%;
     white-space: normal;
     font-size: 14px;
     line-height: 15px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
     margin: 2px;
     color: #505050;
 }
@@ -578,6 +588,7 @@ text-field.flexbox div {
     justify-content: center;
     font-size: 15px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
     overflow: hidden;
     color: #d83448;
     text-align: right;
@@ -650,6 +661,7 @@ text-field.flexbox div {
     font-size: 11px;
     line-height: 13px;
 }
+
 .productboxIZIPASS.medium .image {
     height: 100%;
 }
@@ -657,7 +669,6 @@ text-field.flexbox div {
 .productboxIZIPASS.medium .price {
     font-size: 12px;
 }
-
 
 /*---------------------------SMALL--------------------------*/
 
@@ -728,12 +739,12 @@ text-field.flexbox div {
 /*-----------------MINI BASKET-----------------------------*/
 .catalogBasketDiv {
     overflow: hidden;
-    height:100%;
-    min-height:365px;
+    height: 100%;
+    min-height: 365px;
 }
 
 #miniBasketItems {
-    max-height:245px;
+    max-height: 245px;
 }
 
 .miniBasketPOS {
@@ -741,25 +752,25 @@ text-field.flexbox div {
     min-width: 345px;
     box-shadow: none !important;
     border-left: 1px solid gray;
-    width:344px;
-    height:100%;
-    margin:0;
-    position:initial;
-    border-left:1px solid black;
-    border-top:0;
+    width: 344px;
+    height: 100%;
+    margin: 0;
+    position: initial;
+    border-left: 1px solid black;
+    border-top: 0;
 }
 
 .miniBasketPAD {
     min-width: 345px;
     box-shadow: none !important;
     border-left: 1px solid gray;
-    width:100%;
-    left:0;
-    top:90%;
-    margin:auto;
-    position:absolute;
-    border-left:0;
-    border-top:1px solid black;
+    width: 100%;
+    left: 0;
+    top: 90%;
+    margin: auto;
+    position: absolute;
+    border-left: 0;
+    border-top: 1px solid black;
 }
 
 .miniBasket {
@@ -822,7 +833,7 @@ text-field.flexbox div {
 }
 
 .itemsPanel {
-    max-height:100%;
+    max-height: 100%;
 }
 
 .miniBasket .miniBasketInfos {
@@ -955,6 +966,7 @@ text-field.flexbox div {
     white-space: normal;
     margin: 10px 4px 4px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
     font-size: 10px;
     height: 75px;
     width: 75px;
@@ -963,6 +975,7 @@ text-field.flexbox div {
     padding: 0 5px;
     position: relative;
 }
+
 .btn-payment-small {
     height: 65px;
     width: 60px;
@@ -1076,6 +1089,7 @@ text-field.flexbox div {
     padding: 0px !important;
     font-size: 23px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 .btnPrintStep {
@@ -1095,6 +1109,7 @@ text-field.flexbox div {
     padding: 0px !important;
     font-size: 23px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 .btnDivideTotal {
@@ -1112,6 +1127,7 @@ text-field.flexbox div {
     padding: 0px !important;
     font-size: 23px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 .btnFreeze {
@@ -1241,6 +1257,7 @@ text-field.flexbox div {
     color: white;
     font-size: 12px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 /*-----------------END CATALOG-----------------------------*/
@@ -1321,6 +1338,7 @@ text-field.flexbox div {
     white-space: normal;
     min-width: 30px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
     margin: 4px;
     text-overflow: ellipsis;
 }
@@ -1369,6 +1387,7 @@ text-field.flexbox div {
 .attributesPanelInfos .title {
     font-size: 16px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
     white-space: nowrap;
     letter-spacing: 1px;
 }
@@ -1435,6 +1454,7 @@ text-field.flexbox div {
 .modfront-productsetinfo .productset-title {
     font-size: 20px;
     font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
     line-height: 50px;
     white-space: nowrap;
     letter-spacing: 1px;
@@ -1450,7 +1470,7 @@ text-field.flexbox div {
 /*-----------------MODAL LOGIN---------------------------------------*/
 .itemPosUser {
     justify-content: center;
-    padding:2px;
+    padding: 2px;
 }
 
 .imgCheckPosUser {
@@ -1463,9 +1483,10 @@ text-field.flexbox div {
     display: flex;
     justify-content: center;
 }
+
 .titlePosUser {
-    height:100%;
-    display:flex;
+    height: 100%;
+    display: flex;
     align-items: center;
 }
 
@@ -1474,15 +1495,18 @@ text-field.flexbox div {
     .titlePosUser {
         font-size: 20px;
     }
+
     .imgCheckPosUser {
         top: 0;
         right: -10px;
     }
+
     .imgPosUser {
-        height:100px;
+        height: 100px;
     }
+
     .itemPosUser {
-        width:110px;
+        width: 110px;
     }
 }
 
@@ -1492,12 +1516,15 @@ text-field.flexbox div {
         right: -10px;
         width: 35px;
     }
+
     .imgPosUser {
-        height:70px;
+        height: 70px;
     }
+
     .itemPosUser {
-        width:84px;
+        width: 84px;
     }
+
     .titlePosUser {
         font-size: 16px;
     }
@@ -1699,9 +1726,11 @@ background-color: white;*/
 .shoppingCartSplit .miniBasket {
     width: 100%;
 }
+
 .panel-group {
     margin: 0 !important;
 }
+
 /*-----------------END MODAL shoppingCartSplit -----------------------------------*/
 /*-----------------TEXTFIELD------------------------------------------------------*/
 .textfield {
@@ -1772,13 +1801,15 @@ background-color: white;*/
     .tableInfos {
         max-width: 70px;
     }
+
     .tableInfos .form-panel {
         padding: 10px;
     }
 
     .tableInfos .inp {
-        font-size : 13px;
+        font-size: 13px;
         font-weight: bold;
+        font-family: "SignikaNegative-Semibold", sans-serif;
     }
 }
 
@@ -1807,21 +1838,21 @@ md-input-container label:not(._md-container-ignore) {
 /*---------------End -------------------------------------------------------------------*/
 
 .paiementElement {
-    text-align:center;
-    padding:5px;
+    text-align: center;
+    padding: 5px;
 }
 
 #configurableMenuHeader {
     background-color: #d83448;
     width: 100%;
-    padding:5px;
+    padding: 5px;
 }
 
 .menuAction {
-    position:absolute;
-    height : 50px;
+    position: absolute;
+    height: 50px;
     top: 100px;
-    right : 10px;
+    right: 10px;
 }
 
 .menuAction .menuPrice {
@@ -1835,41 +1866,48 @@ md-input-container label:not(._md-container-ignore) {
 }
 
 #configurableMenuList {
-    padding:0;
+    padding: 0;
 }
+
 .formuleNameList {
-    color:white;
+    color: white;
 }
+
 .productsMenuList {
-    width:100%;
-    height:auto;
+    width: 100%;
+    height: auto;
 }
+
 .productMenuList {
-    width:160px;
-    margin:0 20px;
+    width: 160px;
+    margin: 0 20px;
 }
 
 .btnConfirmMenuList {
     background-color: #5cb85c;
-    color:white;
-    font-weight:bold;
+    color: white;
+    font-weight: bold;
+    font-family: "SignikaNegative-Semibold", sans-serif;
 }
+
 .btnConfirmMenuList:not([disabled]):hover {
     background-color: #5cb85c;
 }
 
 .buttonCatMenuList {
     background-color: white;
-    color:black;
+    color: black;
 }
+
 .buttonCatMenuList:not([disabled]):hover {
     background-color: white;
-    color:black;
+    color: black;
 }
+
 .buttonCatMenuListActive {
     color: #d83448;
 }
 
 ::-webkit-scrollbar {
-    width:0;
+    width: 0;
 }
