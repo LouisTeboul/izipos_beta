@@ -35,7 +35,7 @@
                        ng-click="$rootScope.showShoppingCart = !$rootScope.showShoppingCart">
                 <img class="imgLogo" src="img/cart-drawer.png"/>
 
-                <div class="tabNotif mini" ng-if="getNbItems() > 0" style="position: absolute;bottom: 5px;left: 35px;">
+                <div class="tabNotif cNotif" ng-if="getNbItems() > 0">
                    <span class="tabNotif-text">
                      {{getNbItems()}}
                    </span>

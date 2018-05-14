@@ -33,7 +33,7 @@ app.controller('CatalogController', function ($scope, $rootScope, $state, $uibMo
     $scope.$mdMedia = $mdMedia;
 
     $scope.init = function (IdleProvider) {
-    	$rootScope.showShoppingCart = false;
+    	$rootScope.showShoppingCart = true;
 
         // Login needed
         if ($rootScope.IziBoxConfiguration.LoginRequired) {

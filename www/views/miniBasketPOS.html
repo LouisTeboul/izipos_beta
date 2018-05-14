@@ -1,12 +1,13 @@
 <md-content ng-controller="MiniBasketController" ng-init="init()" id="miniBasket" class="miniBasket" layout="column"
             flex>
     <div layout="column" flex>
-        <div layout="row" ng-show="!currentShoppingCart.ParentTicket && (!$root.UserPreset || $root.UserPreset.DisplayFid)">
+        <div layout="row"
+             ng-show="!currentShoppingCart.ParentTicket && (!$root.UserPreset || $root.UserPreset.DisplayFid)">
             <ng-barcodetextfield flex></ng-barcodetextfield>
             <!--<md-button aria-label="client" class="btnAction"><span class="glyphicon glyphicon-user"></span></md-button>-->
             <md-button aria-label="client" class="btnAction"
                        ng-click="openClientModal()">
-                        <span class="glyphicon glyphicon-user"></span>
+                <span class="glyphicon glyphicon-user"></span>
             </md-button>
         </div>
 
@@ -126,8 +127,8 @@
             </div>
         </div>
 
-        <div layout="column">
-            <uib-accordion close-others="false">
+        <div layout="column" style="height:100%">
+            <uib-accordion close-others="false" class="accPanelMB" style="height:100%;">
                 <uib-accordion-group id="panelTotal" class="panel panel-default miniBasket panel-total"
                                      is-open="accordionStatus.paiementOpen"
                                      ng-click="accordionStatus.ticketOpen=!accordionStatus.paiementOpen">
@@ -152,7 +153,7 @@
                                 <x translate>Offres</x>
                             </a>
                             <div layout="column" layout-align="center end" style="height:100%">
-                                <span>{{currentShoppingCart.Total | CurrencyFormat}}</span>
+                                <span style="margin-right:20px;">{{currentShoppingCart.Total | CurrencyFormat}}</span>
                                 <div layout="row" layout-align="end center"
                                      ng-if="currentShoppingCart && currentShoppingCart.Repaid > 0">
                                     <span class="repaidtitle">Rendu</span>
@@ -288,7 +289,8 @@
                             <img style="width: 25px;height: 20px;margin-left: -12px;" alt="Image" src="img/receipt.png">
                             <span flex></span>
 
-                            <span ng-if="IziBoxConfiguration.StepEnabled && currentShoppingCart">{{currentShoppingCart.CurrentStep | StepName:stepNames}}</span>
+                            <span ng-if="IziBoxConfiguration.StepEnabled && currentShoppingCart"
+                                  style="margin-top:3px;">{{currentShoppingCart.CurrentStep | StepName:stepNames}}</span>
 
                             <span flex></span>
 
@@ -312,7 +314,7 @@
                                        ng-disabled="printStepProdDisabled"
                                        class="btn btn-success btnPrintStep"
                                        ng-click="$event.stopPropagation();selectStep(step.Step);printStepProdShoppingCart();">
-                                        <img style="width:20px;" alt="Image" src="img/chef-hat.png">
+                                        <img class="imgMBStep" alt="Image" src="img/chef-hat.png">
                                     </a>
                                 </div>
                                 <div ng-repeat="item in step.Items track by $index" layout="column" class="itemRow"
@@ -322,14 +324,15 @@
                                     <div layout="column">
                                         <div layout="row">
                                             <div class="productLine" layout="column" flex>
-                                                <strong ng-style="item.Quantity == 0 && {'text-decoration':'line-through'}">{{item.Product.Name}}</strong>
+                                                <strong ng-style="item.Quantity == 0 && {'text-decoration':'line-through'}"
+                                                        class="productName">{{item.Product.Name}}</strong>
 
-                                                <div style="margin-left:10px" layout="row">
+                                                <div class="qtyProductMB" layout="row">
                                                     <strong ng-if="item.Quantity != 1">x
                                                         {{item.Quantity | number : 2}}
                                                     </strong>
 
-                                                    <div style="display: flex; align-items: center; margin-left: 5px;">
+                                                    <div class="prixProductMB">
                                                         <span> ( </span>
                                                         <span ng-if="item.IsFree"> {{0 | CurrencyFormat}}</span>
                                                         <span ng-if="!item.IsFree">
@@ -349,7 +352,7 @@
                                                                ng-disabled="(item.Offer != undefined || item.Quantity - 1 <= 0 )"
                                                                class="itemAction md-fab md-mini"
                                                                ng-click="$event.stopPropagation();decrementQuantity(item);">
-                                                        <span class="glyphicon glyphicon-minus"></span>
+                                                        <span class="glyphicon glyphicon-minus icoBtn"></span>
                                                     </md-button>
 
                                                     <!-- Increment quantity -->
@@ -357,7 +360,7 @@
                                                                ng-disabled="item.Offer != undefined "
                                                                class="itemAction md-fab md-mini"
                                                                ng-click="$event.stopPropagation();incrementQuantity(item);">
-                                                        <span class="glyphicon glyphicon-plus"></span>
+                                                        <span class="glyphicon glyphicon-plus icoBtn"></span>
                                                     </md-button>
 
                                                     <!-- Remove line -->
@@ -365,7 +368,7 @@
                                                                ng-disabled="item.Offer != undefined || currentShoppingCart.Items.length <= 1 || item.Quantity == 0 || item.isPartSplitItem"
                                                                class="itemAction md-fab md-mini"
                                                                ng-click="$event.stopPropagation();removeItem(item);">
-                                                        <span class="glyphicon glyphicon-trash"></span>
+                                                        <span class="glyphicon glyphicon-trash icoBtn"></span>
                                                     </md-button>
                                                 </div>
                                                 <div layout="row"
@@ -374,7 +377,7 @@
                                                     <md-button aria-label="editMenu" class="itemAction md-fab md-mini"
                                                                ng-disabled="isMenuDisable(item)"
                                                                ng-click="$event.stopPropagation();editMenu(item);">
-                                                        <span class="glyphicon glyphicon-pencil"></span>
+                                                        <span class="glyphicon glyphicon-pencil icoBtn"></span>
                                                     </md-button>
 
                                                     <!-- comment -->
@@ -382,7 +385,7 @@
                                                                class="itemAction md-fab md-mini"
                                                                ng-class="{highlight: item.Comment && item.Comment.length > 0}"
                                                                ng-click="$event.stopPropagation();editComment(item);">
-                                                        <span class="glyphicon glyphicon-comment"></span>
+                                                        <span class="glyphicon glyphicon-comment icoBtn"></span>
                                                     </md-button>
 
                                                     <!-- offer -->
@@ -391,7 +394,7 @@
                                                                ng-if=" (item.DiscountIT == 0 || item.DiscountET == 0)"
                                                                class="itemAction md-fab md-mini"
                                                                ng-click="$event.stopPropagation();chooseOffer(item);">
-                                                        <span class="glyphicon glyphicon-gift"></span>
+                                                        <span class="glyphicon glyphicon-gift icoBtn"></span>
                                                     </md-button>
 
                                                     <md-button aria-label="removeOffer"
@@ -439,9 +442,11 @@
                     </md-content>
                 </uib-accordion-group>
 
-                <uib-accordion-group is-open="accordionStatus.paiementOpen" class="panel panel-default miniBasket"
+                <uib-accordion-group is-open="accordionStatus.paiementOpen"
+                                     class="panel panel-default miniBasket paiementDivMB"
                                      ng-click="accordionStatus.ticketOpen=!accordionStatus.paiementOpen"
-                                     ng-if="!currentShoppingCart.isPayed">
+                                     ng-if="!currentShoppingCart.isPayed"
+                                     style="margin-bottom: 5px;">
                     <uib-accordion-heading>
                         <div layout="row">
                             <img style="width: 20px;height: 20px;margin-left: -8px;" alt="Image" src="img/wallet.png">
@@ -473,7 +478,7 @@
                                                 <div layout="column" layout-align="space-around center"
                                                      ng-if="currentShoppingCart.shoppingCartQueue.length >0">
 
-                                                    <div class="tabNotif mini " style="margin-top:3px">
+                                                    <div class="tabNotif" style="margin-top:3px">
                                                         <span class="tabNotif-text">
                                                             {{currentShoppingCart.shoppingCartQueue.length}}
                                                         </span>
@@ -548,15 +553,15 @@
 
                     <div flex="20">
 
-                        <div layout="column" layout-align="space-around center"
+                        <div layout="column" layout-align="space-around center" class="nbrActions"
                              ng-if="orders.length >0 || ordersInProgress.length >0">
-                            <div class="tabNotif mini notifWarning">
+                            <div class="tabNotif notifWarning">
                                 <span class="tabNotif-text ">
                                     {{orders.length}}
                                 </span>
                             </div>
 
-                            <div class="tabNotif mini ">
+                            <div class="tabNotif">
                                 <span class="tabNotif-text">
                                     {{ordersInProgress.length}}
                                 </span>
@@ -591,10 +596,9 @@
                ng-class="{ 'disabled' : PhoneOrderMode }"
                ng-disabled=" PhoneOrderMode == true"
                flex>
-                <span style="white-space:normal"><img style="width:25px;margin-right:2px;"
-                                                      alt="Image" src="img/valid.png">
-                    <img style="width:28px;margin-left:2px;"
-                         alt="Image" src="img/print.png">
+                <span style="white-space:normal">
+                    <!--<img style="width:25px;margin-right:2px;" alt="Image" src="img/valid.png">-->
+                    <img style="width:28px;margin-left:2px;" alt="Image" src="img/print.png">
                 </span>
             </a>
             <a class="shoppingCartAction btn btn-info"

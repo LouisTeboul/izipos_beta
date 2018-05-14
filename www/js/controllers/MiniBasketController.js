@@ -114,11 +114,12 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
                 document.addEventListener('mouseup', function () {
                     isDown = false;
                 }, true);
-
-                myBasketDiv.addEventListener('touchstart', function (e) {
-                    isDown = true;
-                    offset = myBasketDiv.offsetTop - e.touches[0].clientY;
-                }, true);
+                if(myBasketDiv) {
+                    myBasketDiv.addEventListener('touchstart', function (e) {
+                        isDown = true;
+                        offset = myBasketDiv.offsetTop - e.touches[0].clientY;
+                    }, true);
+                }
 
                 document.addEventListener('touchmove', function (e) {
                     e.stopPropagation();
@@ -263,7 +264,7 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
             $timeout(function () {
                 var selectedStep = document.querySelector("#step" + shoppingCart.CurrentStep);
 
-                if (selectedStep && $mdMedia('min-width: 800px')) {
+                if (selectedStep /* && $mdMedia('min-width: 800px') */) {
                     selectedStep.scrollIntoView(false);
                 }
             }, 250);
@@ -751,7 +752,7 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
          * Refresh the miniBasket
          * */
         var resizeMiniBasket = function () {
-            var miniBasketDiv = document.querySelector("#miniBasket");
+            /*var miniBasketDiv = document.querySelector("#miniBasket");
 
             if (miniBasketDiv) {
                 var height = miniBasketDiv.parentElement.clientHeight;
@@ -785,24 +786,21 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
                 var itemsHeight = height - textFieldHeight - switchHeight - totalHeight - headerHeight - divHeight - marginHeight;
 
                 if (miniBasketItemsDiv && !$rootScope.borne) {
-                    miniBasketItemsDiv.style.height = itemsHeight + "px";
-                    /*
+
                     if($mdMedia('(min-width: 800px)')) {
-                        miniBasketItemsDiv.style.height = itemsHeight + "px";
+                        miniBasketItemsDiv.style.height = (itemsHeight + 92) + "px";
                     } else {
-                        if(mBasket){
-                            miniBasketItemsDiv.style.height = mBasket.style.height;
-                        }
-                    }*/
+                        miniBasketItemsDiv.style.height = (itemsHeight + 125) + "px";
+                    }
                 }
 
                 if (miniBasketItemsDiv && $rootScope.borne) {
                     miniBasketItemsDiv.style.maxHeight = itemsHeight + 30 + "px";
-                }
+                }*/
                 /*if (miniBasketInfosDiv) {
                     miniBasketInfosDiv.style.maxHeight = itemsHeight + "px";
                 }*/
-            }
+            //}
 
         };
         //#endregion

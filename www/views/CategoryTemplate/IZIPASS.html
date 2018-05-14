@@ -45,7 +45,7 @@
                         <md-button class="productboxIZIPASS"
                                    aria-label="product button"
                                    ng-class="{'disabled': product.DisableBuyButton,
-                                'small': $root.UserPreset.ItemSize == 1 || (!$mdMedia('gt-sm') && $root.UserPreset.ItemSize != 0),
+                                'small': $root.UserPreset.ItemSize == 1 || !$mdMedia('gt-sm'),
                                 'medium': $root.UserPreset.ItemSize == 2 && $mdMedia('gt-sm'),
                                 'big': $root.UserPreset.ItemSize == 3 && $mdMedia('gt-sm')}"
                                    md-no-ink ng-click="addToCart(product)">

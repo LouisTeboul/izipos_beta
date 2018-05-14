@@ -59,12 +59,6 @@
 }
 
 @font-face {
-    font-family: 'SignikaNegative-SemiBold';
-    src: url('fonts/SignikaNegative-SemiBold.ttf') format('truetype');
-}
-
-
-@font-face {
     font-family: 'LEDCalculator';
     src: url('fonts/LEDCalculator.ttf') format('truetype');
 }
@@ -74,6 +68,10 @@
 /*-----------------------DEFAULTS-------------------------*/
 
 @media (max-height: 700px) {
+    html {
+        /*zoom: 70% !important;*/
+    }
+
     .optional {
         display: none !important;
     }
@@ -372,81 +370,12 @@ text-field.flexbox div {
 
 /*-----------------------END BUTTONS----------------------*/
 
-/*-----------------------CONFIGURATION--------------------*/
-
-.labelversion {
-    position: absolute;
-    font-size: 10px;
-    margin-left: 60px;
-}
-
-.configuration {
-    margin-top: 30px;
-}
-
-.configuration .gaugeIziboxContainer {
-    width: 450px;
-    height: 320px;
-}
-
-.configuration .gaugeIzibox {
-    width: 450px;
-    position: relative;
-}
-
-.configuration .gaugeIziboxValue {
-    position: relative;
-    bottom: 170px;
-}
-
-.configRow {
-    min-height: 30px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-}
-
-.configRow .title {
-    text-align: right;
-}
-
-.configRow .value {
-    text-align: center;
-}
-
-/*-----------------------END CONFIGURATION----------------*/
-
-/*-----------------------LOADING--------------------*/
-
-.loading {
-    margin-top: 30px;
-}
-
-.loading .gaugeContainer {
-    width: 180px;
-}
-
-.loading .gauge {
-    width: 180px;
-    left: 0;
-    position: relative;
-}
-
-.loading .gaugeValue {
-    bottom: 100px;
-    position: relative;
-    font-size: 14px;
-    font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
-}
-
-/*-----------------------END LOADING----------------*/
-
-/*-----------------------CATALOG-------------------*/
+/*--------------------------CATALOG-----------------------*/
 .catalog md-backdrop {
     opacity: 0 !important;
 }
 
-/*-------------------END CATALOG-------------------*/
+/*-----------------------END CATALOG----------------------*/
 
 /*-----------------------DRAWER MENU----------------------*/
 .drawerMenu {
@@ -539,6 +468,10 @@ text-field.flexbox div {
         flex: 1 1 15%;
     }
 
+    .panel-total .btnTable {
+        margin: 2px 2px;
+        height: 36px;
+    }
 }
 
 /*---------------------DEFAULT----------------------------*/
@@ -573,7 +506,6 @@ text-field.flexbox div {
     font-size: 14px;
     line-height: 15px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
     margin: 2px;
     color: #505050;
 }
@@ -584,7 +516,6 @@ text-field.flexbox div {
     justify-content: center;
     font-size: 15px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
     overflow: hidden;
     color: #d83448;
     text-align: right;
@@ -739,10 +670,6 @@ text-field.flexbox div {
     min-height: 365px;
 }
 
-#miniBasketItems {
-    /* max-height: 245px; */
-}
-
 .miniBasketPOS {
     transition: linear 0s !important;
     min-width: 345px;
@@ -769,8 +696,40 @@ text-field.flexbox div {
     border-top: 1px solid black;
 }
 
+.paiementDivMB {
+    width: 100%;
+}
+
+#miniBasketHeader {
+    flex:1;
+}
+
+#miniBasketHeader > div.panel-collapse {
+    height : calc(100% - 32px) !important;
+}
+#miniBasketHeader > div.panel-collapse > div.panel-body {
+    height : 100% !important;
+}
+
+@media (min-width: 800px) {
+    #miniBasketHeader > div.panel-collapse {
+        height : calc(100% - 45px) !important;
+    }
+}
+
+#miniBasketItems {
+    height:100%;
+}
+
 .miniBasket {
     overflow: hidden;
+}
+
+.accPanelMB div[class="panel-group"] {
+    position: relative;
+    display:flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .miniBasket text-field {
@@ -782,7 +741,6 @@ text-field.flexbox div {
 }
 
 .miniBasket .panel-title {
-    font-size: 20px;
     background-color: #d83448 !important;
     color: #FFF;
 }
@@ -829,7 +787,7 @@ text-field.flexbox div {
 }
 
 .itemsPanel {
-    max-height: 100%;
+    height: 100%;
 }
 
 .miniBasket .miniBasketInfos {
@@ -962,10 +920,7 @@ text-field.flexbox div {
     white-space: normal;
     margin: 10px 4px 4px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
     font-size: 10px;
-    height: 75px;
-    width: 75px;
     border: #BFBEBE 1px solid;
     display: table;
     padding: 0 5px;
@@ -1037,8 +992,6 @@ text-field.flexbox div {
     line-height: 18px;
     font-weight: normal;
     text-align: left;
-    margin: 0px -10px !important;
-    height: 40px;
     padding: 2px 5px;
     min-width: 70px;
 }
@@ -1057,7 +1010,7 @@ text-field.flexbox div {
 }
 
 .panel-total .btnOffers {
-    margin: 0px 20px !important;
+    margin: 0 20px !important;
 }
 
 .buttonbar {
@@ -1082,10 +1035,9 @@ text-field.flexbox div {
     margin: -6px -12px !important;
     height: 34px;
     width: 70px;
-    padding: 0px !important;
+    padding: 0 !important;
     font-size: 23px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 .btnPrintStep {
@@ -1102,10 +1054,9 @@ text-field.flexbox div {
     margin: -6px -12px !important;
     height: 34px;
     width: 70px;
-    padding: 0px !important;
+    padding: 0 !important;
     font-size: 23px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 .btnDivideTotal {
@@ -1120,10 +1071,9 @@ text-field.flexbox div {
     margin: -6px 25px -12px !important;
     height: 34px;
     width: 70px;
-    padding: 0px !important;
+    padding: 0 !important;
     font-size: 23px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 .btnFreeze {
@@ -1141,7 +1091,7 @@ text-field.flexbox div {
 .catalogMenu {
     min-height: 100px;
     max-height: 100px;
-    /*box-shadow: 0px -7px 8px 10px grey;*/
+    /*box-shadow: 0 -7px 8px 10px grey;*/
     z-index: 25;
 }
 
@@ -1253,7 +1203,6 @@ text-field.flexbox div {
     color: white;
     font-size: 12px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 /*-----------------END CATALOG-----------------------------*/
@@ -1334,7 +1283,6 @@ text-field.flexbox div {
     white-space: normal;
     min-width: 30px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
     margin: 4px;
     text-overflow: ellipsis;
 }
@@ -1356,9 +1304,37 @@ text-field.flexbox div {
 
 @media (max-width: 799px) {
 
+    .miniBasket .panel-title {
+        font-size: 15px;
+    }
+
     .configurableMenu .editStep {
         justify-content: space-around;
         align-items: center;
+    }
+
+    .miniBasket .stepRow {
+        font-size: 12px;
+        min-height: 25px;
+    }
+
+    .btnPrintStep {
+        height: 25px;
+    }
+
+    .imgMBStep {
+        width: 20px;
+        height: 20px;
+        vertical-align: top;
+    }
+
+    .buttonbar .shoppingCartActionsBar {
+        width: 100%;
+        float: left;
+    }
+
+    #buttonbar {
+        display: inline-block;
     }
 }
 
@@ -1366,7 +1342,7 @@ text-field.flexbox div {
     z-index: 0;
     font-size: 15px;
     color: black;
-    margin: 0px !important;
+    margin: 0 !important;
     width: 24px !important;
     height: 24px !important;
     min-height: 0;
@@ -1383,7 +1359,6 @@ text-field.flexbox div {
 .attributesPanelInfos .title {
     font-size: 16px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
     white-space: nowrap;
     letter-spacing: 1px;
 }
@@ -1450,7 +1425,6 @@ text-field.flexbox div {
 .modfront-productsetinfo .productset-title {
     font-size: 20px;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
     line-height: 50px;
     white-space: nowrap;
     letter-spacing: 1px;
@@ -1488,6 +1462,10 @@ text-field.flexbox div {
 
 @media (min-width: 800px) {
 
+    .miniBasket .panel-title {
+        font-size: 20px;
+    }
+
     .titlePosUser {
         font-size: 20px;
     }
@@ -1504,9 +1482,50 @@ text-field.flexbox div {
     .itemPosUser {
         width: 110px;
     }
+
+    .prixProductMB {
+        display: flex;
+        align-items: center;
+        margin-left: 5px;
+    }
+
+    .qtyProductMB {
+        margin-left: 10px;
+    }
+
+    .tabNotif {
+        height: 20px;
+        line-height: 19px;
+    }
+
+    .panel-total .btnTable {
+        margin: 0 -10px;
+        height: 40px;
+    }
+
+    .panel-total a {
+        padding: 10px 15px;
+    }
+
+    .panel-heading a {
+        padding: 10px 15px;
+    }
+
+    .btn-payment {
+        height: 75px;
+        width: 75px;
+        margin: 10px 4px 4px;
+    }
 }
 
 @media (max-width: 799px) {
+
+    .btn-payment {
+        height: 65px;
+        width: 60px;
+        margin: 5px 3px;
+    }
+
     .imgCheckPosUser {
         top: 0;
         right: -10px;
@@ -1523,6 +1542,76 @@ text-field.flexbox div {
 
     .titlePosUser {
         font-size: 16px;
+    }
+
+    .miniBasket .itemAction {
+        font-size: 15px;
+        color: black;
+        margin: 2px !important;
+        width: 25px !important;
+        height: 25px !important;
+        min-height: 25px;
+        background: lightgray !important;
+    }
+
+    .productName {
+        font-size: 12px;
+    }
+
+    .icoBtn {
+        position: absolute;
+        top: 7px;
+        left: 5px;
+    }
+
+    .imgIcoBtn {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+    }
+
+    .miniBasket .productLine {
+        padding-left: 10px !important;
+        padding-right: 0 !important;
+    }
+
+    .miniBasketPOS {
+        min-width: 275px;
+        width: 275px;
+    }
+
+    .prixProductMB {
+        display: flex;
+        font-size: 10px;
+    }
+
+    .qtyProductMB {
+        margin-left: 0;
+        font-size: 10px;
+    }
+
+    .miniBasket .itemRow {
+        padding-top: 5px;
+        min-height: 42px;
+    }
+
+    .nbrActions {
+        margin-left: 6px;
+        width: 15px;
+    }
+
+    .tabNotif {
+        height: 15px;
+        line-height: 14px;
+    }
+
+    .buttonbar .shoppingCartAction {
+        height: 40px;
+        padding: 3px;
+    }
+
+    .panel-total a {
+        padding: 0;
     }
 }
 
@@ -1575,31 +1664,25 @@ background-color: white;*/
 .tabNotif {
     display: inline-block;
     width: 30px;
-    height: 20px;
     background: #d83448;
     text-align: center;
     border-radius: 15px;
-    margin: 1px 2px 1px 0px;
+    margin: 1px 2px 1px 0;
     color: white;
-    line-height: 19px;
-}
-
-.tabNotif.mini {
-    width: 30px;
-    height: 20px;
-    line-height: 19px;
     font-size: 14px;
-    margin: 1px 2px 1px 0px;
-    border-radius: 15px;
 }
 
-.tabNotif-text {
-    vertical-align: middle;
-}
 
 .tabNotif.notifWarning {
-    /*background: #ec971f;*/
     background: black;
+}
+
+.cNotif {
+    position: absolute;
+    bottom: 5px;
+    left: 35px;
+    width: 18px;
+    padding-top: 1px;
 }
 
 /*-----------------END MODAL unFreeze -----------------------------------*/
@@ -1805,7 +1888,6 @@ background-color: white;*/
     .tableInfos .inp {
         font-size: 13px;
         font-weight: bold;
-        font-family: "SignikaNegative-Semibold", sans-serif;
     }
 }
 
@@ -1823,15 +1905,6 @@ md-input-container label:not(._md-container-ignore) {
     top: -45px;
     right: auto;
 }
-
-/*---------------Bug Fix -MiniBasket display on mobile at lower zoom--------------------*/
-@media (max-width: 456px) {
-    md-sidenav {
-        width: initial !important;
-    }
-}
-
-/*---------------End -------------------------------------------------------------------*/
 
 .paiementElement {
     text-align: center;
@@ -1883,7 +1956,6 @@ md-input-container label:not(._md-container-ignore) {
     background-color: #5cb85c;
     color: white;
     font-weight: bold;
-    font-family: "SignikaNegative-Semibold", sans-serif;
 }
 
 .btnConfirmMenuList:not([disabled]):hover {
