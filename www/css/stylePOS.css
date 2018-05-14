@@ -740,7 +740,7 @@ text-field.flexbox div {
 }
 
 #miniBasketItems {
-    max-height: 245px;
+    /* max-height: 245px; */
 }
 
 .miniBasketPOS {
