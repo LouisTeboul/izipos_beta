@@ -1,0 +1,48 @@
+<section class="" ng-init="init()">
+
+    <div class="modal-header">
+        <h1 class="modal-title" ng-if="mode == 1" translate>Edition de la config. "{{preset.name}}"</h1>
+        <h1 class="modal-title" ng-if="mode == 2" translate>Creation de config</h1>
+    </div>
+
+    <div ng-if="mode == 2" style="padding-top: 10px">
+        <label for="presetName"> Nom du preset : </label>
+        <text-field id="presetName" ng-model="preset.name"
+                    location="center-end"
+                    type="azerty"
+                    validfunction="closeKeyboard"
+                    style="width: 150px;height:30px;"></text-field>
+    </div>
+
+    <div class="form-panel modal-body" layout="column">
+        <div class="flags" layout="row" layout-align="center center">
+            <div ng-repeat="(key, flag) in model.preset.flags" flex>
+                <md-switch ng-model="preset.settings[key]">{{flag.text}}</md-switch>
+            </div>
+        </div>
+        <div class="radios" layout="row">
+            <div ng-repeat="(key, rad) in model.preset.radios" flex>
+                <div> {{rad.text}}</div>
+                <md-radio-group ng-model="preset.settings[key]">
+                    <md-radio-button value="{{option.value}}" ng-repeat="option in rad.values">
+                        {{option.text}}
+                    </md-radio-button>
+                </md-radio-group>
+            </div>
+        </div>
+        <div class="checkboxes" layout="row">
+            <div ng-repeat="(cbkey, cb) in model.preset.checkboxes" flex>
+                <div> {{cb.text}}</div>
+                <md-checkbox ng-repeat="(optkey, option) in cb.values" ng-model="preset.settings[cbkey][optkey]">
+                    {{option.text}}
+                </md-checkbox>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-success" ng-click="ok()" translate>Ok</button>
+        <button class="btn btn-rose" ng-click="cancel()" translate>Fermer</button>
+    </div>
+
+</section>
