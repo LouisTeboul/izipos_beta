@@ -43,7 +43,7 @@ app.run(function ($rootScope, $location, $q, $http, ipService, zposService, $tra
             e.preventDefault();
         });
 
-        $rootScope.Version = "3.0.4.05111";
+        $rootScope.Version = "3.0.4.05141";
 		$rootScope.adminMode = { state: false };
         $rootScope.loading = 0;
 
