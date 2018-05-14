@@ -74,10 +74,6 @@
 /*-----------------------DEFAULTS-------------------------*/
 
 @media (max-height: 700px) {
-    body {
-        zoom: 70% !important;
-    }
-
     .optional {
         display: none !important;
     }

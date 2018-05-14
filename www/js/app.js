@@ -39,6 +39,9 @@ app.run(function ($rootScope, $location, $q, $http, ipService, zposService, $tra
 
 	try {
 		angularLocation = $location;
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
 
         $rootScope.Version = "3.0.4.05111";
 		$rootScope.adminMode = { state: false };
