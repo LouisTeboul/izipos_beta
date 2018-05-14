@@ -47,7 +47,7 @@ app.controller('CatalogMenuController', function ($scope, $rootScope, $state, ca
     };
 
     $scope.goToCategories = function () {
-        $rootScope.showShoppingCart = false;
+        /* $rootScope.showShoppingCart = false; */
         $state.go('catalogPOS.Categories')
     };
 
