@@ -71,12 +71,14 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
         if (!$rootScope.PrinterConfiguration.POSPrinter) $rootScope.PrinterConfiguration.POSPrinter = 1;
         if (!$rootScope.PrinterConfiguration.ProdPrinter) $rootScope.PrinterConfiguration.ProdPrinter = 1;
 
-        var settingsPouchDB = {
-            //mobileAdapter: 'cordova-sqlite',
-            typeDB: 'cordova-sqlite',
-            opts: {live: true, retry: true, batch_size: 50, batches_limit: 100},
-            optsReplicate: {live: true, retry: true, batch_size: 10, batches_limit: 8}
-        };
+        document.addEventListener('deviceready', () => {
+            var settingsPouchDB = {
+                //mobileAdapter: 'cordova-sqlite',
+                typeDB: 'cordova-sqlite',
+                opts: {live: true, retry: true, batch_size: 50, batches_limit: 100},
+                optsReplicate: {live: true, retry: true, batch_size: 10, batches_limit: 8}
+            };
+        });
 
         posLogService.getHardwareIdAsync().then(function (result) {
 
