@@ -11,7 +11,8 @@
                     db.find({
                         selector: {
                             _id: {$regex: 'ShoppingCart_1_*'},
-                            "data.yPeriodId": ypid
+                            "data.yPeriodId": ypid,
+                            "data.Canceled" : false
                         }
                     }).then((resTick) => {
                         db.find({
@@ -39,7 +40,8 @@
                     db.find({
                         selector: {
                             _id: {$regex: 'YPeriod_2_*'},
-                            "data.hardwareId": hidMdl.hid
+                            "data.hardwareId": hidMdl.hid,
+                            "data.Canceled" : false
                         }
                     }).then((res) => {
                         var validArray = [];

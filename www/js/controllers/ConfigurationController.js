@@ -72,7 +72,8 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
         if (!$rootScope.PrinterConfiguration.ProdPrinter) $rootScope.PrinterConfiguration.ProdPrinter = 1;
 
         var settingsPouchDB = {
-            typeDB: 'IndexedDB',
+            //mobileAdapter: 'cordova-sqlite',
+            typeDB: 'cordova-sqlite',
             opts: {live: true, retry: true, batch_size: 50, batches_limit: 100},
             optsReplicate: {live: true, retry: true, batch_size: 10, batches_limit: 8}
         };

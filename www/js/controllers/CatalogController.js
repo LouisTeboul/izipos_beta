@@ -23,7 +23,7 @@
 });
 
 
-app.controller('CatalogController', function ($scope, $rootScope, $state, $uibModal, $location, $uibModalStack, $translate, $mdSidenav, $mdMedia, Idle, shoppingCartModel, posLogService, ngToast, orderShoppingCartService) {
+app.controller('CatalogController', function ($scope, $rootScope, $state, $uibModal, $location, $uibModalStack, $translate, $mdSidenav, $mdMedia, Idle, shoppingCartModel, posLogService, ngToast, orderShoppingCartService, settingService) {
     var watchHandler = undefined;
     var dbOrderChangedHandler = undefined;
     var state = $state;
@@ -33,66 +33,84 @@ app.controller('CatalogController', function ($scope, $rootScope, $state, $uibMo
     $scope.$mdMedia = $mdMedia;
 
     $scope.init = function (IdleProvider) {
-    	$rootScope.showShoppingCart = true;
-
-        // Login needed
-        if ($rootScope.IziBoxConfiguration.LoginRequired) {
-            watchHandler = $scope.$watch(function (scope) {
-                    return $rootScope.PosUserId
-                },
-                function () {
-                    if ($rootScope.PosUserId == 0) {
-                        $scope.showLogin();
-                    }
-                }
-            );
-            $rootScope.PosUserId = 0;
-            // configure Idle settings
-            if (!$rootScope.borne) {
-                Idle.setIdle($rootScope.IziBoxConfiguration.LoginTimeout);
-            }
-        }
-        if ($rootScope.borne) {
-            Idle.setIdle(60);
-            Idle.watch();
-        }
-
-        $rootScope.showLoading();
-
-        orderShoppingCartService.init();
-
-        posLogService.updatePosLogAsync().then(function (posLog) {
-            $rootScope.PosLog = posLog;
-            $rootScope.hideLoading();
-        }, function (errPosLog) {
-            $rootScope.hideLoading();
-            swal({
-                title: "Critique",
-                text: "Erreur d'identification, veuillez relancer l'application.",
-                showConfirmButton: false
-            });
-        });
-
-        dbOrderChangedHandler = $rootScope.$on('dbOrderChange', function (event, args) {
-            var newOrder = Enumerable.from(args.docs).any(function (d) {
-                return !d._deleted;
-            });
-
-            if (newOrder) {
-                Enumerable.from(args.docs).forEach(function (d) {
-                    var orderId = parseInt(d._id.replace("ShoppingCart_1_", ""));
-                    ngToast.create({
-                        className: 'danger',
-                        content: '<b>Nouvelle commande : ' + orderId + '</b>',
-                        dismissOnTimeout: true,
-                        timeout: 10000,
-                        dismissOnClick: true
+        $rootScope.showShoppingCart = true;
+        settingService.getPaymentModesAsync().then((pm) => {
+                if (!pm || pm.length <= 0) {
+                    swal({
+                        title: "Critique",
+                        text: "Aucun moyen de paiements !",
+                        allowEscapeKey: false,
+                        showConfirmButton: false
                     });
-                });
+                } else {
+                    // Login needed
+                    if ($rootScope.IziBoxConfiguration.LoginRequired) {
 
-                $rootScope.$evalAsync();
-            }
-        });
+                        watchHandler = $scope.$watch(function (scope) {
+                                return $rootScope.PosUserId
+                            },
+                            function () {
+                                if ($rootScope.PosUserId == 0) {
+                                    $scope.showLogin();
+                                }
+                            }
+                        );
+                        $rootScope.PosUserId = 0;
+                        // configure Idle settings
+                        if (!$rootScope.borne) {
+                            Idle.setIdle($rootScope.IziBoxConfiguration.LoginTimeout);
+                        }
+                    }
+                    if ($rootScope.borne) {
+                        Idle.setIdle(60);
+                        Idle.watch();
+                    }
+
+                    $rootScope.showLoading();
+
+                    orderShoppingCartService.init();
+
+                    posLogService.updatePosLogAsync().then(function (posLog) {
+                        $rootScope.PosLog = posLog;
+                        $rootScope.hideLoading();
+                    }, function (errPosLog) {
+                        $rootScope.hideLoading();
+                        swal({
+                            title: "Critique",
+                            text: "Erreur d'identification, veuillez relancer l'application.",
+                            showConfirmButton: false
+                        });
+                    });
+
+                    dbOrderChangedHandler = $rootScope.$on('dbOrderChange', function (event, args) {
+                        var newOrder = Enumerable.from(args.docs).any(function (d) {
+                            return !d._deleted;
+                        });
+
+                        if (newOrder) {
+                            Enumerable.from(args.docs).forEach(function (d) {
+                                var orderId = parseInt(d._id.replace("ShoppingCart_1_", ""));
+                                ngToast.create({
+                                    className: 'danger',
+                                    content: '<b>Nouvelle commande : ' + orderId + '</b>',
+                                    dismissOnTimeout: true,
+                                    timeout: 10000,
+                                    dismissOnClick: true
+                                });
+                            });
+                            $rootScope.$evalAsync();
+                        }
+                    });
+                }
+            },
+            (err) => {
+                swal({
+                    title: "Critique",
+                    text: "Aucun moyen de paiements",
+                    showConfirmButton: false
+                });
+            });
+
     };
 
     $scope.$on("$destroy", function () {
