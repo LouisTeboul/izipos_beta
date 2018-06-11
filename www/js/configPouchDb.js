@@ -29,15 +29,6 @@ var settingsPouchDB = {
     // auth: {username: 'posnf', password: 'Izipass2018'}
 };
 
-document.addEventListener('deviceready', () => {
-    settingsPouchDB = {
-        //mobileAdapter: 'cordova-sqlite',
-        typeDB: adapter,
-        opts: {live: true, retry: true, batch_size: 50, batches_limit: 100},
-        optsReplicate: {live: true, retry: true, batch_size: 10, batches_limit: 8}
-    };
-});
-
 
 /**
  * Create the local databases

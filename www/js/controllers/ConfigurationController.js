@@ -65,21 +65,11 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
         var posPrinterCountValue = window.localStorage.getItem("POSPrinterCount");
         var prodPrinterCountValue = window.localStorage.getItem("ProdPrinterCount");
 
-        $rootScope.PrinterConfiguration.POSPrinterCount = posPrinterCountValue != undefined ? parseInt(posPrinterCountValue) : 1;
-        $rootScope.PrinterConfiguration.ProdPrinterCount = prodPrinterCountValue != undefined ? parseInt(prodPrinterCountValue) : 1;
+        $rootScope.PrinterConfiguration.POSPrinterCount = posPrinterCountValue ? parseInt(posPrinterCountValue) : 1;
+        $rootScope.PrinterConfiguration.ProdPrinterCount = prodPrinterCountValue ? parseInt(prodPrinterCountValue) : 1;
 
         if (!$rootScope.PrinterConfiguration.POSPrinter) $rootScope.PrinterConfiguration.POSPrinter = 1;
         if (!$rootScope.PrinterConfiguration.ProdPrinter) $rootScope.PrinterConfiguration.ProdPrinter = 1;
-
-        document.addEventListener('deviceready', () => {
-            var adapter = !!window.sqlitePlugin ? 'cordova-sqlite' : 'websql';
-            settingsPouchDB = {
-                //mobileAdapter: 'cordova-sqlite',
-                typeDB: adapter,
-                opts: {live: true, retry: true, batch_size: 50, batches_limit: 100},
-                optsReplicate: {live: true, retry: true, batch_size: 10, batches_limit: 8}
-            };
-        });
 
         posLogService.getHardwareIdAsync().then(function (result) {
 
@@ -128,7 +118,8 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
      * */
     $scope.emptyCache = function () {
         // Checking if all tickets have already been synchronised with the izibox
-        var dbReplicate = new PouchDB('izipos_replicate', {adapter: settingsPouchDB.typeDB});
+        var adapter = !!window.sqlitePlugin ? 'cordova-sqlite' : 'websql';
+        var dbReplicate = new PouchDB('izipos_replicate', {adapter: adapter});
 
         var deleteCache = function () {
             swal({
@@ -363,7 +354,7 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
 
     $scope.deleteUserPreset = function (preset) {
         /** TODO :  demander confirmation + afficher un toast*/
-        // Supprime le preset dans la box
+            // Supprime le preset dans la box
         var presetApiUrl = "http://" + $rootScope.IziBoxConfiguration.LocalIpIziBox + ":" + $rootScope.IziBoxConfiguration.RestPort + "/DeleteUserPreset";
         var presetPostData = {
             Id: preset.id
