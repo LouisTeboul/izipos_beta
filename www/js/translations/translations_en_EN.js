@@ -100,7 +100,8 @@
 		"Ticket introuvable": "The receipt can not be found",
 		"Vous avez déjà un ticket en cours": "You already have a processing receipt",
 		"Le serveur de fidélité n'est pas joignable ...": "Loyalty server can't be reached ...",
-		"Carte de fidélité introuvable !": "Loyalty card can not be found !",
+        "Carte de fidélité introuvable !": "Loyalty card can not be found !",
+        "Le client a été supprimé, cette carte n'est plus utilisable": "The client has been deleted, this card is no longer usable",
 		"Le ticket a déjà une remise": "A discount is already deducted from this receipt ",
 		"Le ticket-restaurant n'a pu être ajouté !": "Meal voucher can't be added",
 		"Supprimer le ticket ?": "Delete the receipt ?",
@@ -224,6 +225,8 @@
 		"Nom" : "Lastname",
 		"No Carte" : "Loyalty Card Number",
 		"Imprimante borne" : "Terminal printer",
-		"Mode borne" : "Terminal mode",
+        "Mode borne": "Terminal mode",
+        "La izibox n'est pas accèssible": "The izibox is not accessible",
+        "Erreur lors de la fermeture": "Error closing"
 	});
 }]);

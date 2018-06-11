@@ -91,7 +91,7 @@
 
                         };
                         //$http.get(pingApiUrl, { timeout: 1000 }).then(function (data) {
-                        $http.post(pingApiUrl, pingPostData , { timeout: 1000 }).then(function (data) {
+                        $http.post(pingApiUrl, pingPostData , { timeout: 2000 }).then(function (data) {
                             //Ancienne version izibox
                             if (!data.data.LocalDb) {
                                 data.data.LocalDb = true;

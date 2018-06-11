@@ -3,7 +3,7 @@
 @font-face {
     font-family: 'futura_lt_btlight';
     src: url("fonts/futura_light_bt-webfont.eot");
-    src: url("fonts/futura_light_bt-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/futura_light_bt-webfont.woff") format("woff"), url("fonts/futura_light_bt-webfont.ttf") format("truetype"), url("fonts/futura_light_bt-webfont.svg#futura_lt_btlight") format("svg");
+    src: url("fonts/futura_light_bt-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/futura_light_bt-webfont.woff") format("woff");
     font-weight: normal;
     font-style: normal;
 }
@@ -19,7 +19,7 @@
 @font-face {
     font-family: 'reklame_script_regularregular';
     src: url("fonts/reklamescript-regular-webfont.eot");
-    src: url("fonts/reklamescript-regular-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/reklamescript-regular-webfont.woff") format("woff"), url("fonts/reklamescript-regular-webfont.ttf") format("truetype"), url("fonts/reklamescript-regular-webfont.svg#reklame_script_regularregular") format("svg");
+    src: url("fonts/reklamescript-regular-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/reklamescript-regular-webfont.woff") format("woff");
     font-weight: normal;
     font-style: normal;
 }
@@ -27,7 +27,7 @@
 @font-face {
     font-family: 'futura_md_btmedium';
     src: url("fonts/futura-medium-webfont.eot");
-    src: url("fonts/futura-medium-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/futura-medium-webfont.woff") format("woff"), url("fonts/futura-medium-webfont.ttf") format("truetype"), url("fonts/futura-medium-webfont.svg#futura_md_btmedium") format("svg");
+    src: url("fonts/futura-medium-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/futura-medium-webfont.woff") format("woff");
     font-weight: normal;
     font-style: normal;
 }
@@ -67,14 +67,8 @@
 
 /*-----------------------DEFAULTS-------------------------*/
 
-@media (max-height: 700px) {
-    body {
-        /*zoom: 70% !important;*/
-    }
-
-    .optional {
-        display: none !important;
-    }
+* {
+    user-select : none;
 }
 
 body {
@@ -123,28 +117,26 @@ label {
     width: 100%;
     height: 100%;
 }
+
 .keyboardContainer {
     height: 100%;
     width: 100%;
     position: absolute;
     padding: 4px;
 }
+
 .loading {
     margin-top: 30px;
 }
+
 .loading .gaugeContainer {
     width: 180px;
 }
+
 .loading .gauge {
     width: 180px;
     left: 0;
     position: relative;
-}
-.loading .gaugeValue {
-    bottom: 100px;
-    position: relative;
-    font-size: 14px;
-    font-weight: bold;
 }
 
 input:focus, textarea:focus {
@@ -192,42 +184,56 @@ md-input-container label:not(._md-container-ignore) {
 }
 
 .loading .gauge {
-    width : 180px !important
+    width: 180px
 }
 
 .configuration .gaugeIziboxContainer {
     width: 450px;
     height: 320px;
 }
+
 .configuration .gaugeIzibox {
     width: 450px;
     position: relative;
 }
+
 .configuration .gaugeIziboxValue {
     position: relative;
     bottom: 170px;
 }
-@media (max-width: 800px){
+
+@media (min-width: 800px) {
+
+    .loading .gaugeValue {
+        bottom: 95px;
+        left: 60px;
+        position: relative;
+        font-size: 14px;
+        font-weight: bold;
+    }
+}
+
+@media (max-width: 799px) {
     .configuration {
         zoom: 70%;
     }
 
     .loading .gaugeContainer {
-        width : 150px;
+        width: 150px;
     }
 
     .loading .gaugeContainer .gauge {
-        width : 150px !important;
-        height: 90px !important;
+        width: 150px !important;
+        height: 75px !important;
     }
 
-    .loading .gaugeContainer .gaugeValue {
-        bottom : 70px;
+    .loading .gaugeValue {
+        bottom: 60px;
+        position: relative;
+        font-size: 12px;
+        font-weight: bold;
     }
 }
-
-
-
 
 .labelversion {
     position: absolute;
@@ -240,27 +246,28 @@ md-input-container label:not(._md-container-ignore) {
     padding-top: 0px;
     padding-bottom: 0px;
 }
+
 .configRow .title {
     text-align: right;
 }
+
 .configRow .value {
     text-align: center;
 }
 
 .configRow .uib-dropdown-menu .menuItemLink {
-    width : 100%
+    width: 100%
 }
 
 .configRow .uib-dropdown-menu .menuItemDelete {
     cursor: pointer;
-    color:red;
+    color: red;
     padding: 10px
 }
 
 .configRow .uib-dropdown-menu .menuItemDelete:hover {
     cursor: pointer;
 }
-
 
 .configurableMenu .heading .title {
     color: #FFF;
@@ -270,29 +277,36 @@ md-input-container label:not(._md-container-ignore) {
     text-align: center;
     font-size: 20px;
 }
+
 .attributesPanelInfos .title {
     font-size: 16px;
     font-weight: bold;
     white-space: nowrap;
     letter-spacing: 1px;
 }
+
 .modal-openpos .title {
     font-size: 20px;
 }
+
 .modal-closepos .title {
     font-size: 20px;
 }
+
 .modal-editShoppingCart .title {
     font-size: 20px;
 }
+
 .title {
-    margin-right:10px;
+    margin-right: 10px;
 }
+
 .btn-orange {
     background: #ec971f !important;
     color: #fff !important;
     font-weight: bold !important;
 }
+
 .btn-green {
     background: #5cb85c !important;
     color: #fff !important;

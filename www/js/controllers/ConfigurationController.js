@@ -431,7 +431,6 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
     $scope.validConfig = function () {
         //$scope.updateLandscapeRatio();
         //$scope.updatePortraitRatio();
-        console.log($scope.currentPreset);
         if ($scope.currentPreset) {
             $rootScope.UserPreset = $scope.currentPreset.value.settings;
         }

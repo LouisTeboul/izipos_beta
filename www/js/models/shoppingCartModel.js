@@ -77,7 +77,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                 if (result) {
                     // On stock les infos de retour dans le currentShoppingCart
                     if (result.timeGoal) {
-                        currentShoppingCart.DatePickup = result.timeGoal.date;
+                        currentShoppingCart.DatePickup = result.timeGoal.date.toString("dd/MM/yyyy HH:mm:ss");
                         currentShoppingCart.TimeOffset = {
                             hours: result.timeGoal.hours,
                             minutes: result.timeGoal.minutes
@@ -523,6 +523,26 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
 
         //#region Actions on ShoppingCart
 
+        this.NewTimeStampForClonedShoppingCart = function (shoppingCart, index) {
+
+            //On declare le dailyticket comme undefined sur les shoppingcart de la queue
+            //Il sera affecté en même temps que le shopping cart en question deviendra current
+            //Car il est dependant du nombre de ticket validé
+            shoppingCart.dailyTicketId = undefined;
+
+            // Set a new TimeStamp for yeach "new" tickets.
+            // We wait milliseconds just to ensure that we have a unique timestamp
+            var timestamp = new Date().addMilliseconds(index).getTime();
+            shoppingCart.Timestamp = timestamp;
+            shoppingCart.id = timestamp;
+
+            // For the moment we set TableCutleries to undefined, because only the original shoppingcart should have the information
+            shoppingCart.TableCutleries = undefined;
+
+            return shoppingCart;
+
+        };
+
         this.createDividedShoppingCartsAsync = function (shoppingCart, divider) {
 
             var dividedDefer = $q.defer();
@@ -543,27 +563,31 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                     item.Quantity = Math.round10((item.Quantity / divider), -5);
                 });
 
-                var clonedShoppingCart = clone(shoppingCart);
+                var orginalShoppingCart = clone(shoppingCart);
 
+                var clonedShoppingCart;
                 for (var i = 0; i < divider - 1; i++) {
+
+                    clonedShoppingCart = clone(orginalShoppingCart);
+
                     current.calculateTotalFor(clonedShoppingCart);
-                    //On declare le dailyticket comme undefined sur les shoppingcart de la queue
-                    //Il sera affecté en même temps que le shopping cart en question deviendra current
-                    //Car il est dependant du nombre de ticket validé
-                    clonedShoppingCart.dailyTicketId = undefined;
 
                     //Derniere itération
                     if (i == divider - 2) {
-                        var csp = clone(shoppingCart);
+
+                        clonedShoppingCart = current.NewTimeStampForClonedShoppingCart(orginalShoppingCart, i);
 
                         //On ajuste quantité du dernier item pour corrigé les erreurs de nombre flottant de JS
-                        Enumerable.from(csp.Items).forEach(function (item) {
+                        Enumerable.from(clonedShoppingCart.Items).forEach(function (item) {
 
                             item.Quantity = adjustDividedQuantity(item.OriginalQuantity, item.Quantity, divider);
 
                         });
-                        shoppingCart.shoppingCartQueue.push(csp);
+
+                        shoppingCart.shoppingCartQueue.push(clonedShoppingCart);
+
                     } else {
+                        clonedShoppingCart = current.NewTimeStampForClonedShoppingCart(clonedShoppingCart, i);
                         shoppingCart.shoppingCartQueue.push(clonedShoppingCart);
                     }
                 }
@@ -845,7 +869,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                 var b = parseInt(currentBarcode.barcodeValue);
                 if (b) {
                     // Hardcoded limit for the quantity
-                    if (b > 0 && b < 99) {
+                    if (b > 0 && b <= 1000) {
                         qty = b;
                         currentBarcode.barcodeValue = "";
                     }
@@ -862,7 +886,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                         $state.go('catalogPOS.' + product.ProductTemplate.ViewPath, {id: product.Id, offer: offer});
                     }
                 }
-                else if (!forceinbasket && product.EmployeeTypePrice) {								//Product with a posuser defined price
+                else if (!forceinbasket && product.EmployeeTypePrice) {         //Product with a posuser defined price
                     var modalInstance = $uibModal.open({
                         templateUrl: 'modals/modalTypePrice.html',
                         controller: 'ModalTypePriceController',
@@ -899,7 +923,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                         });
                     }
 
-                    if (!cartItem || product.ProductAttributes.length > 0 || product.EmployeeTypePrice || product.ProductComments.length > 0) {
+                    if (!cartItem || product.ProductAttributes.length > 0 || product.EmployeeTypePrice || product.ProductComments.length > 0 || !$rootScope.UserPreset.GroupProducts) {
                         cartItem = new ShoppingCartItem();
                         cartItem.ProductId = product.Id;
                         cartItem.Product = product;
@@ -1003,7 +1027,6 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
             posPeriodService.getYPeriodAsync(currentShoppingCart.HardwareId, currentShoppingCart.PosUserId, true, false).then(function (yp) {
 
                 currentShoppingCart.yPeriodId = yp.id;
-                currentShoppingCart.yPeriodId = yp.id;
                 currentShoppingCart.zPeriodId = yp.zPeriodId;
                 var currentDate = new Date();
                 currentShoppingCart.Date = currentDate.toString('dd/MM/yyyy H:mm:ss');
@@ -1011,7 +1034,6 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                     currentShoppingCart.DateProd = currentShoppingCart.Date;
                 }
                 var toSave = clone(currentShoppingCart);
-
 
                 //TODO : Add the posuser to create a ticket from an online order
                 // Suppressing line with zero for quantity
@@ -1030,7 +1052,6 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                         deliveryType = currentShoppingCart.DeliveryType;
                         currentShoppingCartOut = undefined;
                         $rootScope.$emit("shoppingCartChanged", currentShoppingCart);
-
                     }
 
                     if (currentShoppingCart.shoppingCartQueue.length >= 1) {
@@ -1057,8 +1078,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                             });
                         }
                     }
-                }
-                else {
+                } else {
                     current.clearShoppingCart();
                 }
                 $rootScope.hideLoading();
@@ -1089,7 +1109,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                 $rootScope.showLoading();
 
                 //The ticket must be paid
-                if (!currentShoppingCart.Residue == 0 && !currentShoppingCart.ParentTicket) {
+                if (currentShoppingCart.Residue > 0 && !currentShoppingCart.ParentTicket) {
                     $rootScope.hideLoading();
                     sweetAlert($translate.instant("Le ticket n'est pas soldé"));
                     return;
@@ -1108,7 +1128,6 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                 if (currentShoppingCart.TableNumber) {
                     //On stock l'info du temps d'activité de la table
                     currentShoppingCart.TableActiveTime = Date.now() - currentShoppingCart.Timestamp - 3600000;
-
                 }
 
                 // Si le ticket est associé à un client
@@ -1480,27 +1499,65 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
         //Put a ticket in a stand-by
         //When a ticket is 'unfreezed' other POs can't access it
         this.freezeShoppingCart = function () {
-            if (currentShoppingCart != undefined) {
-                shoppingCartService.freezeShoppingCartAsync(currentShoppingCart).then(function (result) {
-                    if (currentShoppingCartOut) {
-                        current.setCurrentShoppingCart(currentShoppingCartOut);
-                        currentShoppingCartOut = undefined;
-                        currentShoppingCartIn = undefined;
+            if (currentShoppingCart) {
+
+                var freezeCurrent = () => {
+                    shoppingCartService.freezeShoppingCartAsync(currentShoppingCart).then(() => {
+                        if (currentShoppingCartOut) {
+                            current.setCurrentShoppingCart(currentShoppingCartOut);
+                            currentShoppingCartOut = undefined;
+                            currentShoppingCartIn = undefined;
+                        } else {
+                            current.clearShoppingCart();
+                        }
+                    }, () => {
+                        sweetAlert($translate.instant("Erreur de mise en attente !"));
+                    });
+                };
+
+                if ($rootScope.UserPreset && $rootScope.UserPreset.PrintOnFreeze) {
+                    if ($rootScope.IziBoxConfiguration.StepEnabled) {
+                        if (!currentShoppingCart.hasBeenFrozen) {
+                            current.printStepProdShoppingCartAsync(currentShoppingCart).then(() => {
+                                freezeCurrent();
+                            })
+                        } else {
+                            swal({
+                                title: $translate.instant("Mise en attente"),
+                                text: $translate.instant("Ce ticket à déjà imprimé en cuisine. Voulez-vous le réimprimer ?"),
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#d83448",
+                                confirmButtonText: $translate.instant("Oui"),
+                                cancelButtonText: $translate.instant("Non"),
+                                closeOnConfirm: true
+                            }, function (result) {
+                                if (result) {
+                                    current.printStepProdShoppingCartAsync(currentShoppingCart).then(() => {
+                                        freezeCurrent();
+                                    })
+                                } else {
+                                    freezeCurrent()
+                                }
+                            })
+                        }
                     } else {
-                        current.clearShoppingCart();
+                        freezeCurrent()
                     }
-                }, function (err) {
-                    sweetAlert($translate.instant("Erreur de mise en attente !"));
-                });
+                    // TODO : envoyer un toast
+                } else {
+                    freezeCurrent();
+                }
+
             }
         };
 
         this.setCurrentShoppingCart = function (shoppingCart) {
             if (!shoppingCart.Discounts) {
-                shoppingCart.Discounts = new Array();
+                shoppingCart.Discounts = [];
             }
             if (!shoppingCart.Items) {
-                shoppingCart.Items = new Array();
+                shoppingCart.Items = [];
             }
             currentShoppingCart = shoppingCart;
             deliveryType = currentShoppingCart.DeliveryType;
@@ -1510,7 +1567,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
         };
 
         this.unfreezeShoppingCartById = function (id) {
-            if (currentShoppingCart == undefined) {
+            if (!currentShoppingCart) {
                 shoppingCartService.getFreezedShoppingCartByIdAsync(id).then(function (shoppingCart) {
                     shoppingCartService.unfreezeShoppingCartAsync(shoppingCart).then(function () {
                         currentShoppingCart = shoppingCart;
@@ -1529,7 +1586,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
         };
 
         this.unfreezeShoppingCartByBarcode = function (barcode) {
-            if (currentShoppingCart == undefined) {
+            if (!currentShoppingCart) {
                 shoppingCartService.getFreezedShoppingCartByBarcodeAsync(barcode).then(function (shoppingCart) {
                     shoppingCartService.unfreezeShoppingCartAsync(shoppingCart).then(function () {
 
@@ -1554,7 +1611,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
         };
 
         this.unfreezeShoppingCart = function () {
-            if (currentShoppingCart == undefined) {
+            if (!currentShoppingCart) {
                 var modalInstance = $uibModal.open({
                     templateUrl: 'modals/modalUnfreezeShoppingCart.html',
                     controller: 'ModalUnfreezeShoppingCartController',
@@ -1584,7 +1641,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
         };
 
         this.clearShoppingCart = function () {
-            if (currentShoppingCart != undefined) {
+            if (currentShoppingCart) {
                 //console.log($rootScope.UserPreset.DefaultDeliveryMode);
                 if ($rootScope.UserPreset) {
                     $rootScope.UserPreset.DefaultDeliveryMode ? current.setDeliveryType($rootScope.UserPreset.DefaultDeliveryMode) : current.setDeliveryType(DeliveryTypes.FORHERE);
@@ -1601,17 +1658,20 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
             this.updatePaymentModes();
         };
 
+        this.setTableCutleries = function (nb) {
+            currentShoppingCart.TableCutleries = nb;
+        };
 
         this.selectTableNumber = function () {
             var currentTableNumber;
 
-            if (currentShoppingCart != undefined && currentShoppingCart.TableNumber != undefined) {
+            if (currentShoppingCart && currentShoppingCart.TableNumber) {
                 currentTableNumber = currentShoppingCart.TableNumber;
             }
 
             var currentTableCutleries;
 
-            if (currentShoppingCart != undefined && currentShoppingCart.TableCutleries != undefined) {
+            if (currentShoppingCart && currentShoppingCart.TableCutleries) {
                 currentTableCutleries = currentShoppingCart.TableCutleries;
             }
 
@@ -1641,7 +1701,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                         }
                     };
 
-                    if (currentShoppingCart == undefined) {
+                    if (!currentShoppingCart) {
                         shoppingCartService.getFreezedShoppingCartByTableNumberAsync(tableValues.tableNumber).then(function (sc) {
                             current.setCurrentShoppingCart(sc);
                             shoppingCartService.unfreezeShoppingCartAsync(sc);
@@ -1795,7 +1855,12 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                         current.calculateLoyalty();
                         $rootScope.$emit("customerLoyaltyChanged", loyalty);
                     } else {
-                        swal($translate.instant("Carte de fidélité introuvable !"));
+                        if (loyalty && loyalty != '' && !angular.isObject(loyalty)) {
+                            swal($translate.instant(loyalty));
+                        }
+                        else {
+                            swal($translate.instant("Carte de fidélité introuvable !"));
+                        }
                     }
                 }, function (err) {
                     console.log(err);
@@ -2152,6 +2217,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
             }
 
             var tkRestoPaymentMode = Enumerable.from(paymentModesAvailable).firstOrDefault(function (pm) {
+                // Attention, si il y a plusieurs mode de paiement de type ticket resto, ca peut retourné nimporte lequel
                 return pm.PaymentType == PaymentType.TICKETRESTAURANT;
             });
 
@@ -2214,20 +2280,8 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
         this.addPaymentMode = function (selectedPaymentMode, isValidCancel) {
             var result = false;
 
-            if (currentShoppingCart != undefined) {
-                if (!currentShoppingCart.PaymentModes) {
-                    currentShoppingCart.PaymentModes = [];
-                }
-
-                var paymentMode = Enumerable.from(currentShoppingCart.PaymentModes).firstOrDefault("x => x.Value == '" + selectedPaymentMode.Value + "'");
-
-                if (!paymentMode) {
-                    paymentMode = selectedPaymentMode;
-                } else {
-                    paymentMode.Total = roundValue(paymentMode.Total + selectedPaymentMode.Total);
-                }
-
-                result = current.setPaymentMode(paymentMode, isValidCancel);
+            if (currentShoppingCart) {
+                result = current.setPaymentMode(selectedPaymentMode, isValidCancel);
             }
 
             return result;
@@ -2236,7 +2290,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
         this.setPaymentMode = function (paymentMode, isValidCancel) {
             var result = false;
 
-            if (currentShoppingCart != undefined) {
+            if (currentShoppingCart) {
 
                 console.log(currentShoppingCart);
 
@@ -2371,19 +2425,26 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
          */
         this.calculateTotal = function () {
             this.calculateTotalFor(currentShoppingCart);
+
+            if (currentShoppingCart) {
+                $rootScope.$emit("shoppingCartTotalChanged", currentShoppingCart.Total);
+            }
         };
 
         // TODO : Make only one function
         this.calculateTotalFor = function (shoppingCart) {
             //console.log("calc for");
             taxesService.calculateTotalFor(shoppingCart);
+
+            if (currentShoppingCart && shoppingCart == currentShoppingCart) {
+                $rootScope.$emit("shoppingCartTotalChanged", currentShoppingCart.Total);
+            }
         };
 
         //#endregion
 
         //#region Properties
         this.getCurrentShoppingCart = function () {
-
             this.calculateTotalFor(); // For each get current we're doing calculation
             return currentShoppingCart;
         };
@@ -2406,6 +2467,8 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
             deliveryType = value;
             if (currentShoppingCart)
                 currentShoppingCart.DeliveryType = deliveryType;
+
+            $rootScope.$emit('deliveryTypeChanged', value);
 
             this.calculateTotal();
         };

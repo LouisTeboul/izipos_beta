@@ -15,67 +15,110 @@ app.controller('ModalEditPresetController', function ($scope, $rootScope, $uibMo
             $scope.preset = selectedPreset.value;
 
             $scope.model.preset = {
-                flags: {
-                    DisplayFid: {
-                        value: true,
-                        text: "Bandeau fidélité",
-                    },
-                    DisplayDelivery: {
-                        value: true,
-                        text: "Modes de conso.",
-                    }
-
-                },
-                radios: {
-                    HandPreference: {
-                        values : [
-                            {value: 1, text: 'Droitier'},
-                            {value: 2, text: 'Gaucher'}
-                        ],
-                        value: 1,
-                        text: "Main dominante"
-                    },
-
-                    DefaultDeliveryMode: {
-                        values: [
-                            {value: 0, text: "Sur Place"},
-                            {value: 1, text: "A Emporté"},
-                            {value: 2, text: "Livré"},
-                        ],
-                        value: 0,
-                        text: "Mode de conso. par defaut",
-                    },
-
-                    ItemSize: {
-                        values: [
-                            {value: 0, text: "Old School"},
-                            {value: 1, text: "Petit"},
-                            {value: 2, text: "Moyen"},
-                            {value: 3, text: "Grand"},
-                        ],
-                        value: 1,
-                        text: "Taille des produits",
-                    },
-                },
-                checkboxes: {
-                    DisplayButtons: {
-                        values: {
-                            Valid: {
+                tabs : {
+                    0: {
+                        name: "Affichage",
+                        flags: {
+                            DisplayFid: {
                                 value: true,
-                                text: "Validation"
+                                text: "Bandeau fidélité",
                             },
-                            ValidAndPrint: {
+                            DisplayDelivery: {
                                 value: true,
-                                text: "Validation + Impr."
+                                text: "Modes de conso.",
                             },
-                            PrintProd: {
+                            GroupProducts: {
                                 value: true,
-                                text: "Impr. note"
+                                text: "Grouper les produits",
+                            }
+
+                        },
+                        radios: {
+                            HandPreference: {
+                                values : [
+                                    {value: 1, text: 'Droitier'},
+                                    {value: 2, text: 'Gaucher'}
+                                ],
+                                value: 1,
+                                text: "Main dominante"
+                            },
+
+                            ItemSize: {
+                                values: [
+                                    {value: 1, text: "Petit"},
+                                    {value: 2, text: "Moyen"},
+                                    {value: 3, text: "Grand"},
+                                ],
+                                value: 1,
+                                text: "Taille des produits",
                             },
                         },
-                        text: "Affichage des boutons",
+                        checkboxes: {
+                            DisplayButtons: {
+                                values: {
+                                    Valid: {
+                                        value: true,
+                                        text: "Validation"
+                                    },
+                                    ValidAndPrint: {
+                                        value: true,
+                                        text: "Validation + Impr."
+                                    },
+                                    PrintProd: {
+                                        value: true,
+                                        text: "Impr. note"
+                                    },
+                                },
+                                text: "Affichage des boutons",
+                            },
+                        },
                     },
-                },
+                    1: {
+                        name : "Fonctionnel",
+                        flags: {
+                            PrintOnFreeze: {
+                                value: false,
+                                text: "Impr. auto freeze"
+                            }
+
+                        },
+                        radios: {
+                            DefaultDeliveryMode: {
+                                values: [
+                                    {value: 0, text: "Sur Place"},
+                                    {value: 1, text: "A Emporté"},
+                                    {value: 2, text: "Livré"},
+                                ],
+                                value: 0,
+                                text: "Mode de conso. par defaut",
+                            },
+                        },
+                        checkboxes: {
+                            ForceOnCreateTicket: {
+                                values: {
+                                    /*
+                                    Table: {
+                                        value: false,
+                                        text: "Numéro de table"
+                                    },*/
+                                    Cutleries: {
+                                        value: false,
+                                        text: "Nb. de couverts"
+                                    },
+                                    /*
+                                    DeliveryMode: {
+                                        value: false,
+                                        text: "Mode de conso."
+                                    },*/
+                                },
+                                text: "Forcer la saisie",
+                            },
+                        },
+                    }
+
+
+                }
+
             };
         };
 

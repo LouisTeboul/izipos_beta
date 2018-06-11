@@ -10,7 +10,7 @@
  * For displaying the progress bar of data loading from couchdb
  * Plugged to the data loading event
  */
-app.controller('LoadingController', function ($scope, $rootScope, $location, $timeout, $q, $injector, updateService, zposService, settingService, posService, borneService) {
+app.controller('LoadingController', function ($scope, $rootScope, $location, $timeout, $q, $injector, updateService, zposService, settingService, posService, categoryService, borneService) {
 
     var currencyReady = false;
     // What's the difference with dbReplic below
@@ -150,19 +150,53 @@ app.controller('LoadingController', function ($scope, $rootScope, $location, $ti
             $rootScope.modelDb.orderReady) {
 
             $rootScope.modelDb.databaseReady = true;
-            $rootScope.$evalAsync();
 
-            initServices($rootScope, $injector);
-            if(currencyReady){
-                borneService.redirectToHome();
+            categoryService.getCategoriesAsync().then(function (categories) {
+                $rootScope.storedCategories = {};
+                categories = categories.filter(c => c.IsEnabled);
+
+                function callback(storage) {
+                    if (storage.mainProducts === 0 && storage.subProducts === 0) {
+                        //window.localStorage.setItem('Category' + storage.mainCategory.id, JSON.stringify(storage));
+                        $rootScope.storedCategories['' + storage.mainCategory.Id] = storage;
+
+                        /*
+                        if (Object.keys($rootScope.storedCategories).length === categories.length && !$rootScope.init) {
+
+                            console.log($rootScope.storedCategories);
+                            $rootScope.init = true;
+                            initServices($rootScope, $injector);
+                            borneService.redirectToHome();
+                        }
+                        */
+                    }
+                }
+
+                categories.forEach(function (c) {
+                    /*
+                    if(window.localStorage.getItem('Category' + c.id)){
+                        callback(window.localStorage.getItem('Category' + c.id));
+                    }
+                    */
+                    categoryService.loadCategory(c.id, callback);
+                });
+
+
+            });
+
+            if (!$rootScope.init) {
+                setTimeout(function(){
+                    $rootScope.init = true;
+                    initServices($rootScope, $injector);
+                    borneService.redirectToHome();
+                }, 500);
+
             }
-
         }
     };
 
 
     $scope.init = function () {
-
         if ($rootScope.borne) {
             $rootScope.IziBoxConfiguration.LoginRequired = false;
         }

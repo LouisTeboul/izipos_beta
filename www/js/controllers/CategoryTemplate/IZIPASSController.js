@@ -7,7 +7,7 @@
 });
 
 
-app.controller('IZIPASSController', function ($scope, $rootScope, $stateParams, $location, $state, $timeout, $mdMedia, categoryService, productService, pictureService) {
+app.controller('IZIPASSController', function ($scope, $rootScope, $stateParams, $location, $state, $timeout, $mdMedia, categoryService, productService, pictureService, shoppingCartModel) {
     var self = this;
     $scope.$mdMedia = $mdMedia;
 
@@ -28,59 +28,45 @@ app.controller('IZIPASSController', function ($scope, $rootScope, $stateParams, 
     };
 
     $scope.init = function () {
+        // $scope.deliveryType = shoppingCartModel.getDeliveryType();
+        $scope.useCache = false;
         // Get selected category
         var categoryId = $stateParams.id;
-        $scope.load(categoryId);
+        if ($rootScope.storedCategories['' + categoryId]) {
+            $scope.useCache = true;
+            $timeout(() => {
+                $rootScope.modelPos.categoryLoading = false;
+            }, 1);
+            checkLoading($rootScope.storedCategories['' + categoryId]);
+        } else {
+            categoryService.loadCategory(categoryId, checkLoading);
+        }
     };
 
-    var loadingInfos = {
-        mainCategory: undefined,
-        subCategories: undefined,
-        mainProducts: undefined,
-        subProducts: undefined
-    };
+    /*$rootScope.$on('deliveryTypeChanged', (event, args) => {
+       $scope.deliveryType = args;
+       console.log($scope.deliveryType);
+    });*/
 
-    var checkLoading = function () {
-        if (loadingInfos.mainProducts == 0 && loadingInfos.subProducts == 0) {
-            $scope.model.category = loadingInfos.mainCategory;
-            $scope.model.subCategories = loadingInfos.subCategories;
-            $scope.$evalAsync();
-
-            if($scope.model.subCategories){
-                if($mdMedia('max-width: 800px')){
-                    console.log('subcat, max width 800px');
-                    $scope.containerHeight = { 'height' : 'calc(100vh - 100px)'};
-                } else {
-                    console.log('subcat, max width ! 800px');
-                    $scope.containerHeight = { 'height' : 'calc(100vh - 150px)'};
-                }
-            } else {
-                if ($mdMedia('min-width: 800px')) {
-                    console.log('pas subcat, min width 800px');
-                    $scope.containerHeight = {'height': 'calc(100vh - 100px )'};
-                }
+    var checkLoading = function (storage) {
+        if (storage.mainProducts === 0 && storage.subProducts === 0) {
+            $scope.model.category = storage.mainCategory;
+            $scope.model.products = storage.mainCategory.products;
+            if (storage.subCategories) {
+                $scope.model.subCategories = storage.subCategories;
+                storage.subCategories.forEach(function (subCat) {
+                    $scope.model.products = $scope.model.products.concat(subCat.products)
+                });
             }
-
             $rootScope.modelPos.categoryLoading = false;
-            $scope.shouldRepeat = true;
-            /*
-            if($rootScope[$scope.model.category.Id]){
-                $scope.categoryData = $rootScope[$scope.model.category.Id].innerHTML.replace(/ng-repeat=".*"/g, '' );
-                $scope.shouldRepeat = false;
-            } else {
-                $scope.shouldRepeat = true;
-                $rootScope[$scope.model.category.Id] = document.querySelector('#categoryContent');
-            }*/
-
-
             $rootScope.$evalAsync();
         }
     };
 
-    $scope.load = function (categoryId) {
+    /*$scope.load = function (categoryId, callback) {
+        var storage = {};
 
         categoryService.getCategoryByIdAsync(categoryId).then(function (category) {
-
             if (!category.products) {
                 // Get products for this category
                 productService.getProductForCategoryAsync(categoryId).then(function (results) {
@@ -88,7 +74,7 @@ app.controller('IZIPASSController', function ($scope, $rootScope, $stateParams, 
 
                         category.products = Enumerable.from(results).orderBy('x => x.ProductCategory.DisplayOrder').toArray();
 
-                        loadingInfos.mainProducts = category.products.length;
+                        storage.mainProducts = category.products.length;
 
                         // Pictures
                         Enumerable.from(category.products).forEach(function (p) {
@@ -100,8 +86,8 @@ app.controller('IZIPASSController', function ($scope, $rootScope, $stateParams, 
                                     }
                                     p.DefaultPictureUrl = url;
 
-                                    loadingInfos.mainProducts--;
-                                    checkLoading();
+                                    storage.mainProducts--;
+                                    callback(storage);
                                 });
                             });
                         });
@@ -112,20 +98,20 @@ app.controller('IZIPASSController', function ($scope, $rootScope, $stateParams, 
             }
             else {
                 setTimeout(function () {
-                    loadingInfos.mainProducts = 0;
-                    checkLoading();
+                    storage.mainProducts = 0;
+                    callback(storage);
                 }, 1);
             }
 
-            loadingInfos.mainCategory = category;
+            storage.mainCategory = category;
 
 
             categoryService.getSubCategoriesByParentAsync(categoryId).then(function (subCategories) {
                 //Recupere toutes les sous categories du parent
 
                 if (subCategories.length == 0) {
-                    loadingInfos.subProducts = 0;
-                    checkLoading();
+                    storage.subProducts = 0;
+                    callback(storage);
                 }
 
                 Enumerable.from(subCategories).forEach(function (subCat) {
@@ -135,10 +121,10 @@ app.controller('IZIPASSController', function ($scope, $rootScope, $stateParams, 
 
                                 subCat.products = Enumerable.from(results).orderBy('x => x.ProductCategory.DisplayOrder').toArray();
 
-                                if (loadingInfos.subProducts) {
-                                    loadingInfos.subProducts += subCat.products.length;
+                                if (storage.subProducts) {
+                                    storage.subProducts += subCat.products.length;
                                 } else {
-                                    loadingInfos.subProducts = subCat.products.length;
+                                    storage.subProducts = subCat.products.length;
                                 }
 
                                 // Pictures
@@ -151,8 +137,8 @@ app.controller('IZIPASSController', function ($scope, $rootScope, $stateParams, 
                                             }
                                             p.DefaultPictureUrl = url;
 
-                                            loadingInfos.subProducts--;
-                                            checkLoading();
+                                            storage.subProducts--;
+                                            callback(storage);
                                         });
                                     });
                                 });
@@ -161,23 +147,39 @@ app.controller('IZIPASSController', function ($scope, $rootScope, $stateParams, 
                             console.log(err);
                         });
                     } else {
-                        loadingInfos.subProducts = 0;
-                        checkLoading();
+                        storage.subProducts = 0;
+                        callback(storage);
                     }
                 });
-
-                loadingInfos.subCategories = subCategories;
+                storage.subCategories = subCategories;
             })
         }, function (err) {
             console.log(err);
         });
     };
-
+    */
 
     $scope.scrollTo = function (elementId) {
+        console.log(elementId);
         var updatedItemElem = document.querySelector('#c' + elementId);
         if (updatedItemElem) {
             $("#allCategories").scrollTo(updatedItemElem);
         }
     };
+
+    $scope.addToCart = function (idProduct) {
+        var product = Enumerable.from($scope.model.products).firstOrDefault(function (p) {
+            return p.Id === idProduct;
+        });
+
+        if (product) {
+            if (!product.DisableBuyButton) {
+                shoppingCartModel.addToCart(product);
+            }
+        } else {
+            console.log("oops, pas de product");
+        }
+    };
+
+
 });

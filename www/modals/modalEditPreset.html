@@ -15,29 +15,35 @@
     </div>
 
     <div class="form-panel modal-body" layout="column">
-        <div class="flags" layout="row" layout-align="center center">
-            <div ng-repeat="(key, flag) in model.preset.flags" flex>
-                <md-switch ng-model="preset.settings[key]">{{flag.text}}</md-switch>
-            </div>
-        </div>
-        <div class="radios" layout="row">
-            <div ng-repeat="(key, rad) in model.preset.radios" flex>
-                <div> {{rad.text}}</div>
-                <md-radio-group ng-model="preset.settings[key]">
-                    <md-radio-button value="{{option.value}}" ng-repeat="option in rad.values">
-                        {{option.text}}
-                    </md-radio-button>
-                </md-radio-group>
-            </div>
-        </div>
-        <div class="checkboxes" layout="row">
-            <div ng-repeat="(cbkey, cb) in model.preset.checkboxes" flex>
-                <div> {{cb.text}}</div>
-                <md-checkbox ng-repeat="(optkey, option) in cb.values" ng-model="preset.settings[cbkey][optkey]">
-                    {{option.text}}
-                </md-checkbox>
-            </div>
-        </div>
+        <uib-tabset>
+            <uib-tab ng-repeat=" tab in model.preset.tabs" heading="{{tab.name}}">
+                <div class="flags" layout="row" layout-align="center center">
+                    <div ng-repeat="(key, flag) in tab.flags" flex>
+                        <md-switch ng-model="preset.settings[key]">{{flag.text}}</md-switch>
+                    </div>
+                </div>
+                <div class="radios" layout="row">
+                    <div ng-repeat="(key, rad) in tab.radios" flex>
+                        <div> {{rad.text}}</div>
+                        <md-radio-group ng-model="preset.settings[key]">
+                            <md-radio-button value="{{option.value}}" ng-repeat="option in rad.values">
+                                {{option.text}}
+                            </md-radio-button>
+                        </md-radio-group>
+                    </div>
+                </div>
+                <div class="checkboxes" layout="row">
+                    <div ng-repeat="(cbkey, cb) in tab.checkboxes" flex>
+                        <div> {{cb.text}}</div>
+                        <md-checkbox ng-repeat="(optkey, option) in cb.values" ng-model="preset.settings[cbkey][optkey]">
+                            {{option.text}}
+                        </md-checkbox>
+                    </div>
+                </div>
+            </uib-tab>
+
+        </uib-tabset>
+
     </div>
 
     <div class="modal-footer">

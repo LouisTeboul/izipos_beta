@@ -69,7 +69,7 @@
 
 @media (max-height: 700px) {
     html {
-        /*zoom: 70% !important;*/
+        zoom: 80% !important;
     }
 
     .optional {
@@ -86,7 +86,6 @@ body {
 h1 {
     color: #d83448;
     letter-spacing: -0.5px;
-    font-size: 36px;
 }
 
 h2 {
@@ -177,6 +176,7 @@ html {
 }
 
 .labelErr {
+    text-align: center;
     color: #d83448;
 }
 
@@ -190,11 +190,19 @@ html {
     background: #3398ed;
     border-radius: 50%;
     display: inline-block;
-    padding: 0.2em;
+    padding: 1px;
     color: #f2f2f2;
     right: -10px;
-    top: -10px;
-    width: 25px;
+    top: -5px;
+    height: 20px;
+    width: 20px;
+    font-size: 15px;
+    text-align: center;
+}
+
+.unFreezeTable {
+    margin-left: 10px;
+    margin-right: 10px;
     text-align: center;
 }
 
@@ -297,7 +305,9 @@ text-field.flexbox div {
 }
 
 .vertical-divider {
-    height: 100px !important;
+    height: 100% !important;
+    width: 2px;
+    margin-right: 5PX;
     border-color: gray !important;
 }
 
@@ -382,7 +392,6 @@ text-field.flexbox div {
     max-width: 210px !important;
     min-width: 210px !important;
     background-color: #272727;
-    top: 100px !important;
     z-index: 100;
     /* box-shadow: -6px 14px 5px 9px grey !important; */
 }
@@ -395,32 +404,26 @@ text-field.flexbox div {
 
 /*---------------------HEADER CATEGORIES------------------*/
 
-.subCategoriesHeading-pad {
-    flex-wrap: nowrap !important;
-    background-color: #d83448 !important;
-    position: relative;
-    height: calc(100vh - 100px);
-    max-width: 100px !important;
-}
-
-.subCategoriesHeading-pos {
-    position: relative;
-    background-color: #d83448 !important;
-
-}
-
 .scHeadingButton {
     min-width: 30px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 799px) {
     .scHeadingButton {
         max-width: calc(100% - 20px);
     }
-}
 
-.ssCategory {
-    margin-left: 40px;
+    .subCategoriesHeading {
+        flex-wrap: nowrap;
+        position: relative;
+        max-width: 100px !important;
+        flex: 1;
+        background-color: #d83448 !important;
+    }
+
+    h1 {
+        font-size: 18px;
+    }
 }
 
 /*------------------END HEADER CATEGORIES-----------------*/
@@ -434,18 +437,22 @@ text-field.flexbox div {
 
 .IZIPASSTemplate .categoryContent {
     display: flex;
-    flex-direction: column;
 }
 
 .IZIPASSTemplate .categoryContent .quickAccess {
     display: flex;
     flex-direction: row;
-    align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
+    overflow: scroll;
 }
 
 @media (max-width: 799px) {
+
+    .panel-title a {
+        display: block;
+        padding: 5px 15px;
+    }
+
     .IZIPASSTemplate .categoryContent {
         flex-direction: row;
     }
@@ -460,12 +467,7 @@ text-field.flexbox div {
 
     .IZIPASSTemplate .categoryContent .quickAccess {
         flex-direction: column;
-        align-items: start;
         justify-content: start;
-    }
-
-    .IZIPASSTemplate .categoryContent .quickAccess.subCategories-pad {
-        flex: 1 1 15%;
     }
 
     .panel-total .btnTable {
@@ -496,13 +498,19 @@ text-field.flexbox div {
 }
 
 .productboxIZIPASS .imageContainer {
+    display: flex;
+    justify-content: center;
     height: 40%;
     margin-bottom: 5px
 }
 
 .productboxIZIPASS .titleRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 45%;
     white-space: normal;
+    text-align: center;
     font-size: 14px;
     line-height: 15px;
     font-weight: bold;
@@ -600,19 +608,13 @@ text-field.flexbox div {
 /*---------------------------SMALL--------------------------*/
 
 .productboxIZIPASS.small {
-    width: 85px;
-    height: 90px;
+    width: 75px;
+    height: 85px;
 }
 
 .productboxIZIPASS.small .titleRow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: normal;
     font-size: 10px;
     line-height: 11px;
-    margin: 2px;
-    color: #505050;
 }
 
 .productboxIZIPASS.small .image {
@@ -633,16 +635,13 @@ text-field.flexbox div {
 .barcodeTextField .btnClear {
     height: 38px;
     min-width: 35px;
-    border: 1px;
-    border-right: 0;
-    border-top: 0;
-    border-style: solid;
-    border-color: gray;
+    border: 0 solid gray;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
 }
 
 .barcodeTextField .inp {
-    border-style: solid;
-    border-color: lightgray;
+    border: solid lightgray;
     font-size: 13px;
     margin-top: 1px;
 }
@@ -701,24 +700,89 @@ text-field.flexbox div {
 }
 
 #miniBasketHeader {
-    flex:1;
+    margin-top: 0;
+    flex: 1;
 }
 
 #miniBasketHeader > div.panel-collapse {
-    height : calc(100% - 32px) !important;
+    height: calc(100% - 32px) !important;
 }
+
 #miniBasketHeader > div.panel-collapse > div.panel-body {
-    height : 100% !important;
+    height: 100% !important;
 }
 
 @media (min-width: 800px) {
+
+    .subCategoriesHeading {
+        position: relative;
+        flex-wrap: wrap;
+        background-color: #d83448 !important;
+    }
+
+    .IZIPASSTemplate .categoryContent {
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .groupItemsSplit {
+        font-size: 15px;
+    }
+
+    .menuAction .menuPrice {
+        font-size: 23px;
+    }
+
     #miniBasketHeader > div.panel-collapse {
-        height : calc(100% - 45px) !important;
+        height: calc(100% - 45px) !important;
+    }
+
+    .drawerMenu {
+        top: 100px !important;
+    }
+
+    h1 {
+        font-size: 36px;
+    }
+
+    .unFreezeTable {
+        font-size: 15px;
+    }
+
+    .productComment {
+        font-size: 15px;
+        line-height: 20px;
+    }
+}
+
+/*@media (max-height: 599px) {
+    .btn-menu {
+        margin-top: 0;
+    }
+
+    .btn {
+        padding: 0 12px;
+    }
+}*/
+
+@media (min-height: 600px) {
+    .btn-menu {
+        margin-top: 5px;
+    }
+
+    .btn {
+        padding: 6px 12px;
     }
 }
 
 #miniBasketItems {
-    height:100%;
+    height: 100%;
+}
+
+#miniBasketItemsSplit .productLine {
+    flex: 2;
+    justify-content: space-around;
+    font-size: 14px;
 }
 
 .miniBasket {
@@ -727,7 +791,7 @@ text-field.flexbox div {
 
 .accPanelMB div[class="panel-group"] {
     position: relative;
-    display:flex;
+    display: flex;
     flex-direction: column;
     height: 100%;
 }
@@ -796,7 +860,7 @@ text-field.flexbox div {
 }
 
 .miniBasket .itemRow {
-    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
     padding-top: 10px;
     padding-bottom: 5px;
     min-height: 50px;
@@ -823,15 +887,6 @@ text-field.flexbox div {
     border-top: 1px solid #aaa;
     min-height: 40px;
     background: #C5C5C5;
-}
-
-.miniBasket .itemAction {
-    font-size: 15px;
-    color: black;
-    margin: 2px !important;
-    width: 36px !important;
-    height: 36px !important;
-    background: lightgray !important;
 }
 
 .miniBasket .itemAction.highlight {
@@ -927,11 +982,6 @@ text-field.flexbox div {
     position: relative;
 }
 
-.btn-payment-small {
-    height: 65px;
-    width: 60px;
-}
-
 .btn-payment .btn-payment-text {
     max-height: 45px;
     overflow: hidden;
@@ -957,7 +1007,6 @@ text-field.flexbox div {
 
 .panel-title a {
     display: block;
-    padding: 10px 15px;
     margin: -10px -15px;
     text-decoration: none !important;
 }
@@ -966,7 +1015,6 @@ text-field.flexbox div {
     background-color: black;
     text-decoration: none !important;
     color: #5cb85c;
-    font-size: 25px;
     font-weight: bold;
     font-family: 'LEDCalculator';
     text-align: right;
@@ -986,11 +1034,10 @@ text-field.flexbox div {
     float: left;
     font-family: SignikaNegative-Regular;
     font-weight: normal;
-    font-size: 16px;
+    font-size: 14px;
     background-color: #46b8da;
     color: white;
     line-height: 18px;
-    font-weight: normal;
     text-align: left;
     padding: 2px 5px;
     min-width: 70px;
@@ -1000,17 +1047,12 @@ text-field.flexbox div {
     float: left;
     font-family: 'Helvetica';
     font-weight: normal;
-    font-size: 18px;
+    font-size: 16px;
     background-color: #46b8da;
     color: white;
     line-height: 20px;
-    font-weight: normal;
     text-align: left;
     margin: -5px -10px !important;
-}
-
-.panel-total .btnOffers {
-    margin: 0 20px !important;
 }
 
 .buttonbar {
@@ -1033,7 +1075,7 @@ text-field.flexbox div {
 
 .btnAddStep {
     margin: -6px -12px !important;
-    height: 34px;
+    height: 31px;
     width: 70px;
     padding: 0 !important;
     font-size: 23px;
@@ -1089,14 +1131,14 @@ text-field.flexbox div {
 /*-----------------CATALOG-----------------------------*/
 
 .catalogMenu {
-    min-height: 100px;
+    min-height: 75px;
     max-height: 100px;
     /*box-shadow: 0 -7px 8px 10px grey;*/
     z-index: 25;
 }
 
 .catalogMenu .tools {
-    min-height: 100px;
+    min-height: 50px;
     background: #272727;
 }
 
@@ -1116,17 +1158,14 @@ text-field.flexbox div {
 }
 
 .catalogMenu .version {
-    text-align: right;
+    display: flex;
+    align-items: flex-end;
     color: #B6B4B4;
-    font-size: 14px;
 }
 
 .catalogMenu .izibox {
     background: #d83448;
-    width: 18px;
-    height: 18px;
     border-radius: 50%;
-    margin: 5px;
 }
 
 .catalogMenu .izibox.connected {
@@ -1141,7 +1180,9 @@ text-field.flexbox div {
     text-align: right;
     color: #d83448;
     padding-right: 5px;
-    font-size: 14px;
+    bottom: 0;
+    right: 0;
+    position: absolute;
 }
 
 .catalogMenu .itemCategory {
@@ -1190,19 +1231,34 @@ text-field.flexbox div {
 .categories .imgCategory {
     width: 100%;
     height: auto;
-    max-height: 70px;
-    max-width: 70px;
+    max-height: 45px;
+    max-width: 45px;
 }
 
 .categories .linkCategory {
     width: 75px !important;
-    height: 70px !important;
+    height: 55px !important;
 }
 
 .categories .titleCategory {
     color: white;
     font-size: 12px;
     font-weight: bold;
+    line-height: 14px;
+}
+
+.cashMachineName {
+    word-wrap: break-word;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    direction: rtl;
+}
+
+.headerVersions {
+    position: absolute;
+    right: 0;
+    font-size: 10px;
 }
 
 /*-----------------END CATALOG-----------------------------*/
@@ -1295,22 +1351,69 @@ text-field.flexbox div {
 
 .configurableMenu .editStep .stepName {
     padding: 0 10px;
-    min-width: 120px;
     height: 30px;
-    font-size: 16px;
+    font-size: 14px;
     color: white;
     text-align: center;
+    white-space: nowrap;
 }
 
 @media (max-width: 799px) {
 
+    .menuAction .menuPrice {
+        font-size: 14px;
+    }
+
+    .stepAttri {
+        font-size: 10px;
+    }
+
+    .iziPLogo {
+        margin-top: 0 !important;
+    }
+
+    .unFreezeTable {
+        font-size: 12px;
+    }
+
+    .catalogMenu .infoCashMovement {
+        font-size: 10px;
+    }
+
+    .iziPLogo img {
+        margin-top: -7px;
+    }
+
+    .deliveryMode {
+        margin: 0 !important;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .productComment {
+        font-size: 11px;
+        line-height: 15px;
+    }
+
+    .itemCategory {
+        margin-top: 10px;
+    }
+
+    .drawerMenu {
+        top: 75px !important;
+    }
+
     .miniBasket .panel-title {
-        font-size: 15px;
+        font-size: 14px;
     }
 
     .configurableMenu .editStep {
         justify-content: space-around;
         align-items: center;
+    }
+
+    .cashMachineName {
+        max-width: 90px;
     }
 
     .miniBasket .stepRow {
@@ -1383,17 +1486,17 @@ text-field.flexbox div {
 }
 
 .attributeBox {
-    height: 90px !important;
-    width: 100px !important;
+    height: 85px !important;
+    width: 90px !important;
     background: #fff !important;
     border: 1px solid #dbdada !important;
     color: #505050 !important;
-    margin: 2.5px !important;
-    font-size: 13px !important;
+    margin: 2px !important;
     text-align: center !important;
     font-weight: bolder !important;
     border-radius: 7px 7px 7px 0 !important;
     padding: 0 !important;
+    min-height: 85px !important;
 }
 
 .attributeBox .attributeInfo-text {
@@ -1408,8 +1511,8 @@ text-field.flexbox div {
 }
 
 .attributeBox .imgAttribute {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
 }
 
 .attributeBox.active {
@@ -1435,6 +1538,13 @@ text-field.flexbox div {
     line-height: 50px;
 }
 
+.miniBasket .itemAction {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /*-----------------END CONFIGURABLE MENU-----------------------------*/
 
 /*-----------------MODAL LOGIN---------------------------------------*/
@@ -1449,9 +1559,29 @@ text-field.flexbox div {
     position: absolute;
 }
 
+.productMiniBasket {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-left: 10px;
+    font-size: 12px;
+}
+
+.headerNPad {
+    min-width: 150px !important;
+    font-size: 14px;
+}
+
+.detailsSplitTicket {
+    font-size: 14px;
+}
+
+.headerPad {
+    font-size: 10px;
+}
+
 .modalLoginPOS {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
 }
 
 .titlePosUser {
@@ -1460,7 +1590,90 @@ text-field.flexbox div {
     align-items: center;
 }
 
+.btn-payment-ultrasmall {
+    height: 50px !important;
+    width: 60px !important;
+    margin: 4px !important;
+}
+
+.btn-payment-image-small {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+.btn-payment-text-small {
+    bottom: 4px !important;
+}
+
 @media (min-width: 800px) {
+
+    .detailsSplitTicket {
+        margin: 15px;
+    }
+
+    .attributeBox {
+        font-size: 11px !important;
+    }
+
+    .panel-total .btnOffers {
+        margin: 0 20px !important;
+        height: 40px;
+        padding: 9px;
+    }
+
+    .catalogMenu .infoCashMovement {
+        font-size: 14px;
+    }
+
+    .miniBasket .itemAction {
+        font-size: 15px;
+        color: black;
+        margin: 2px !important;
+        width: 36px !important;
+        height: 36px !important;
+        background: lightgray !important;
+    }
+
+    .btn-payment-small {
+        height: 65px !important;
+        width: 60px !important;
+    }
+
+    #miniBasketItemsSplit .productLine {
+        margin-left: 20px;
+    }
+
+    .btnAddStep {
+        height: 34px;
+    }
+
+    .catalogMenu .izibox {
+        width: 18px;
+        height: 18px;
+        margin: 5px;
+    }
+
+    .headerS {
+        height: 100px;
+    }
+
+    .catalogMenu .logo {
+        margin-top: 5px;
+        padding: 0;
+    }
+
+    .cashMachineName {
+        max-width: 150px;
+    }
+
+    .version horloge {
+        font-size: 14px;
+    }
+
+    .panel-title a {
+        display: block;
+        padding: 10px 15px;
+    }
 
     .miniBasket .panel-title {
         font-size: 20px;
@@ -1505,6 +1718,7 @@ text-field.flexbox div {
 
     .panel-total a {
         padding: 10px 15px;
+        font-size: 32px;
     }
 
     .panel-heading a {
@@ -1519,6 +1733,49 @@ text-field.flexbox div {
 }
 
 @media (max-width: 799px) {
+
+    #miniBasketItemsSplit .productLine {
+        margin-left: 0;
+    }
+
+    .detailsSplitTicket {
+        margin: 5px;
+    }
+
+    .panel-total .btnOffers {
+        margin: 2px 10px !important;
+        height: 36px;
+        padding: 7px;
+    }
+
+    .attributeBox {
+        font-size: 10px !important;
+    }
+
+    .catalogMenu .izibox {
+        width: 10px;
+        height: 10px;
+        margin: 1px;
+    }
+
+    .catalogMenu .logo {
+        margin-top: 10px;
+        padding: 0 6px;
+    }
+
+    .btnAddStep {
+        height: 31px;
+    }
+
+    .btn-payment-small {
+        height: 65px !important;
+        width: 48px !important;
+    }
+
+    .headerS {
+        height: 75px;
+        justify-content: flex-start;
+    }
 
     .btn-payment {
         height: 65px;
@@ -1556,12 +1813,6 @@ text-field.flexbox div {
 
     .productName {
         font-size: 12px;
-    }
-
-    .icoBtn {
-        position: absolute;
-        top: 7px;
-        left: 5px;
     }
 
     .imgIcoBtn {
@@ -1612,6 +1863,7 @@ text-field.flexbox div {
 
     .panel-total a {
         padding: 0;
+        font-size: 20px;
     }
 }
 
@@ -1672,7 +1924,6 @@ background-color: white;*/
     font-size: 14px;
 }
 
-
 .tabNotif.notifWarning {
     background: black;
 }
@@ -1681,8 +1932,9 @@ background-color: white;*/
     position: absolute;
     bottom: 5px;
     left: 35px;
-    width: 18px;
-    padding-top: 1px;
+    width: auto;
+    min-width: 18px;
+    padding: 1px 2px;
 }
 
 /*-----------------END MODAL unFreeze -----------------------------------*/
@@ -1702,6 +1954,10 @@ background-color: white;*/
 
 .modal-openpos .title {
     font-size: 20px;
+}
+
+.groupItemsSplit {
+    margin-top: -1px;
 }
 
 .modal-openpos .item {
@@ -1876,9 +2132,17 @@ background-color: white;*/
     max-width: 170px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 799px) {
+    .tableTile > h1 {
+        font-size: 32px
+    }
+
     .tableInfos {
         max-width: 70px;
+    }
+
+    .groupItemsSplit {
+        font-size: 14px;
     }
 
     .tableInfos .form-panel {
@@ -1919,13 +2183,12 @@ md-input-container label:not(._md-container-ignore) {
 
 .menuAction {
     position: absolute;
-    height: 50px;
+    min-height: 26px;
     top: 100px;
     right: 10px;
 }
 
 .menuAction .menuPrice {
-    font-size: 23px;
     padding: 0 10px;
 }
 
@@ -1967,6 +2230,10 @@ md-input-container label:not(._md-container-ignore) {
     color: black;
 }
 
+.catMenu::-webkit-scrollbar {
+    height: 0;
+}
+
 .buttonCatMenuList:not([disabled]):hover {
     background-color: white;
     color: black;
@@ -1978,4 +2245,39 @@ md-input-container label:not(._md-container-ignore) {
 
 ::-webkit-scrollbar {
     width: 0;
+}
+
+#IZIPASSController {
+    padding: 0 !important;
+    flex: 1;
+    display: flex;
+}
+
+#allCategories {
+    padding: 3px;
+    max-width: 100%;
+    flex: 1;
+}
+
+.orderListTo {
+    font-size: 20px;
+}
+
+.btnFiltreCaisse {
+    width: 100%;
+    max-height: 34px;
+    max-width: 194px;
+}
+
+.textBtnFiltreCaisse {
+    max-width: 150px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    float: left;
+}
+
+.productComment {
+    margin: 0 -15px;
+    background-color: #F4F4F4;
+    color: grey;
 }

@@ -40,7 +40,9 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
             // Causes infinite digest loop
             // BUGFIX: The loyalty div was modified after the miniBasketResize()
             $scope.$watch(function () {
-                return document.querySelector("#loyaltyRow").clientHeight;
+                var cHLoyalty = document.querySelector("#loyaltyRow");
+                if (cHLoyalty)
+                    return cHLoyalty.clientHeight;
             }, function () {
                 resizeMiniBasket();
             });
@@ -76,14 +78,14 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
             });
 
             //Move
-            if($mdMedia('(max-width: 800px)')) {
+            if ($mdMedia('(max-width: 800px)')) {
                 var posMouse;
                 var offset = 0;
                 var padHeight = window.innerHeight;
                 var myBasketDiv = document.querySelector(".miniBasketPAD");
                 var isDown = false;
 
-                if(myBasketDiv){
+                if (myBasketDiv) {
                     myBasketDiv.style.height = (padHeight - 100) + 'px';
 
                     myBasketDiv.addEventListener('mousedown', function (e) {
@@ -99,10 +101,10 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
                         posMouse = e.clientY;
                         var moveTop = posMouse + offset;
                         if (moveTop >= 0 && moveTop < (padHeight * 0.75) && offset > -150) {
-                            if(moveTop < 75) {
+                            if (moveTop < 75) {
                                 moveTop = 0;
                             }
-                            if(moveTop > (padHeight * 0.60)) {
+                            if (moveTop > (padHeight * 0.60)) {
                                 moveTop = Math.floor(padHeight * 0.75);
                             }
                             myBasketDiv.style.top = moveTop + 'px';
@@ -114,7 +116,7 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
                 document.addEventListener('mouseup', function () {
                     isDown = false;
                 }, true);
-                if(myBasketDiv) {
+                if (myBasketDiv) {
                     myBasketDiv.addEventListener('touchstart', function (e) {
                         isDown = true;
                         offset = myBasketDiv.offsetTop - e.touches[0].clientY;
@@ -127,10 +129,10 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
                         posMouse = e.touches[0].clientY;
                         var moveTop = posMouse + offset;
                         if (moveTop >= 0 && moveTop < (padHeight * 0.75) && offset > -150) {
-                            if(moveTop < 75) {
+                            if (moveTop < 75) {
                                 moveTop = 0;
                             }
-                            if(moveTop > (padHeight * 0.60)) {
+                            if (moveTop > (padHeight * 0.60)) {
                                 moveTop = Math.floor(padHeight * 0.75);
                             }
                             myBasketDiv.style.top = moveTop + 'px';
@@ -483,10 +485,14 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
 
         $scope.selectPaymentMode = function (selectedPaymentMode) {
 
-            // Attention à la fonction d'arrondi
-            var customValue = $scope.totalDivider > 1 ? parseFloat((Math.round($scope.currentShoppingCart.Total / $scope.totalDivider * 100) / 100).toFixed(2)) : undefined;
+            if($scope.currentShoppingCart.Residue > 0) {
+                // Attention à la fonction d'arrondi
+                var customValue = $scope.totalDivider > 1 ? parseFloat((Math.round($scope.currentShoppingCart.Total / $scope.totalDivider * 100) / 100).toFixed(2)) : undefined;
 
-            shoppingCartModel.selectPaymentMode(selectedPaymentMode, customValue, $rootScope.IziPosConfiguration.IsDirectPayment);
+                shoppingCartModel.selectPaymentMode(selectedPaymentMode, customValue, $rootScope.IziPosConfiguration.IsDirectPayment);
+            }
+
+
         };
 
         $scope.splitShoppingCart = function () {
@@ -615,7 +621,6 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
                     shoppingCartModel.freezeShoppingCart();
                 } else {
                     swal("Le ticket doit contenir au moins un produit !");
-                    return;
                 }
             } else {
                 shoppingCartModel.freezeShoppingCart();
@@ -624,15 +629,42 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
         };
 
         $scope.validShoppingCart = function (ignorePrintTicket) {
-            shoppingCartModel.validShoppingCart(ignorePrintTicket);
+            if (!$scope.currentShoppingCart.ParentTicket) {
+                if ($rootScope.UserPreset && $rootScope.UserPreset.ForceOnCreateTicket && $rootScope.UserPreset.ForceOnCreateTicket.Cutleries) {
+                    var modalInstance = $uibModal.open({
+                        templateUrl: 'modals/modalCutleries.html',
+                        controller: 'ModalCutleriesController',
+                        size: 'sm',
+                        resolve: {
+                            initCutleries : function () {
+                                return $scope.currentShoppingCart.TableCutleries
+                            }
+                        },
+                        backdrop: 'static',
+                    });
+
+                    modalInstance.result.then(function (nbCutleries) {
+                        shoppingCartModel.setTableCutleries(nbCutleries);
+                        if ($rootScope.IziBoxConfiguration.ForceDeliveryChoice) {
+                            shoppingCartModel.openModalDelivery(ignorePrintTicket);
+                        } else {
+                            shoppingCartModel.validShoppingCart(ignorePrintTicket);
+                        }
+                    }, function () {
+                        console.log('Erreur');
+                    });
+                } else {
+                    if ($rootScope.IziBoxConfiguration.ForceDeliveryChoice) {
+                        shoppingCartModel.openModalDelivery(ignorePrintTicket);
+                    } else {
+                        shoppingCartModel.validShoppingCart(ignorePrintTicket);
+                    }
+                }
+            }
         };
 
         $scope.confirmBorneOrder = function () {
             shoppingCartModel.validBorneOrder();
-        };
-
-        $scope.openModalDelivery = function (parameter) {
-            shoppingCartModel.openModalDelivery(parameter);
         };
 
         $scope.openCustomActionModal = function () {
@@ -654,7 +686,7 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
                         $scope.printProdDisabled = false;
                     }, 700);
                 });
-                //Desactiver le bouton Print Prod (bleu) tant que la requete n'a pas timeout / n'est pas resolu
+                // Desactiver le bouton Print Prod (bleu) tant que la promesse n'a pas timeout / n'est pas resolu
             }
         };
 
@@ -752,56 +784,10 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
          * Refresh the miniBasket
          * */
         var resizeMiniBasket = function () {
-            /*var miniBasketDiv = document.querySelector("#miniBasket");
-
-            if (miniBasketDiv) {
-                var height = miniBasketDiv.parentElement.clientHeight;
-
-                var textFieldHeight = 38;
-                var totalHeight = 62;
-                var headerHeight = 42 * 2;
-                var switchHeight = 43;
-                var divHeight = 0;
-                var marginHeight = 35;
-
-                var miniBasketItemsDiv = document.querySelector("#miniBasketItems");
-                var miniBasketInfosDiv = document.querySelector("#miniBasketInfos");
-                var buttonBarDiv = document.querySelector("#buttonbar");
-                var loyaltyRowDiv = document.querySelector("#loyaltyRow");
-                var paymentModesDiv = document.querySelector("#paymentModes");
-                var mBasket = document.querySelector(".miniBasketPAD");
-
-                if (buttonBarDiv) {
-                    divHeight = buttonBarDiv.clientHeight;
-                }
-
-                if (loyaltyRowDiv) {
-                    divHeight += loyaltyRowDiv.clientHeight;
-                }
-
-                if (paymentModesDiv) {
-                    divHeight += paymentModesDiv.clientHeight;
-                }
-
-                var itemsHeight = height - textFieldHeight - switchHeight - totalHeight - headerHeight - divHeight - marginHeight;
-
-                if (miniBasketItemsDiv && !$rootScope.borne) {
-
-                    if($mdMedia('(min-width: 800px)')) {
-                        miniBasketItemsDiv.style.height = (itemsHeight + 92) + "px";
-                    } else {
-                        miniBasketItemsDiv.style.height = (itemsHeight + 125) + "px";
-                    }
-                }
-
-                if (miniBasketItemsDiv && $rootScope.borne) {
-                    miniBasketItemsDiv.style.maxHeight = itemsHeight + 30 + "px";
-                }*/
-                /*if (miniBasketInfosDiv) {
-                    miniBasketInfosDiv.style.maxHeight = itemsHeight + "px";
-                }*/
-            //}
-
+            var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            if(w >= 800 && !$rootScope.showShoppingCart) {
+                $rootScope.showShoppingCart = true;
+            }
         };
         //#endregion
 
@@ -835,9 +821,8 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
             $scope.currentShoppingCart.customerLoyalty = null;
             $rootScope.$emit("customerLoyaltyChanged", $scope.currentShoppingCart.customerLoyalty);
             $rootScope.$emit("shoppingCartChanged", $scope.currentShoppingCart);
-            resizeMiniBasket();
             shoppingCartModel.clearShoppingCart();
-            if($rootScope.borne){
+            if ($rootScope.borne) {
                 borneService.redirectToHome();
             }
         }

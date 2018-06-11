@@ -37,11 +37,11 @@ app.config(function ($stateProvider, $urlRouterProvider, ngToastProvider, $trans
 
 app.run(function ($rootScope, $location, $q, $http, ipService, zposService, $translate, $uibModal) {
 
-	try {
-		angularLocation = $location;
+    try {
+        angularLocation = $location;
 
-        $rootScope.Version = "3.0.4.05142";
-		$rootScope.adminMode = { state: false };
+        $rootScope.Version = "3.0.4.06111";
+        $rootScope.adminMode = { state: false };
         $rootScope.loading = 0;
 
         $rootScope.modelPos = {
@@ -84,7 +84,7 @@ app.run(function ($rootScope, $location, $q, $http, ipService, zposService, $tra
         }
 
         // Display configuration
-        $rootScope.RatioConfiguration = {Enabled: true};
+        $rootScope.RatioConfiguration = { Enabled: true };
 
         if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry|IEMobile)/)) {
             $rootScope.isBrowser = false;
@@ -114,6 +114,9 @@ app.run(function ($rootScope, $location, $q, $http, ipService, zposService, $tra
             $rootScope.isBrowser = false;
             $rootScope.isWindowsContainer = true;
             init($rootScope, $location, $q, $http, ipService, zposService, $translate, $uibModal);
+
+            initLineDisplay($rootScope);
+
         } else {
             $rootScope.isBrowser = true;
             $rootScope.isWindowsContainer = false;
@@ -128,6 +131,50 @@ app.run(function ($rootScope, $location, $q, $http, ipService, zposService, $tra
         console.error(exAll);
     }
 });
+
+var initLineDisplay = function ($rootScope) {
+    lineDisplay.clearScreen();
+
+    $rootScope.$on("shoppingCartChanged", function (event, shoppingCart) {
+        if (shoppingCart && shoppingCart.Total) {
+            lineDisplay.writeLine1("TOTAL : " + roundValue(shoppingCart.Total).toFixed(2) + " \u20ac");
+        }
+    });
+
+    $rootScope.$on("shoppingCartTotalChanged", function (event, total) {
+        lineDisplay.writeLine1("TOTAL : " + roundValue(total).toFixed(2) + " \u20ac");
+    });
+
+    var updateDisplay2 = function (cartItem) {
+        var itemLineQty = cartItem.Quantity + " x ";
+        var itemLinePrice = " ";
+        if (cartItem.IsFree) {
+            itemLinePrice += "0.00 \u20ac";
+        } else {
+            itemLinePrice += roundValue(cartItem.PriceIT + cartItem.DiscountIT).toFixed(2);
+
+            itemLinePrice += " \u20ac";
+        }
+
+        var itemLineName = cartItem.Product.Name.substring(0, 19 - (itemLineQty.length + itemLinePrice.length));
+
+        var itemLine = itemLineQty + itemLineName + itemLinePrice;
+
+        lineDisplay.writeLine2(itemLine);
+    };
+
+    $rootScope.$on("shoppingCartItemAdded", function (event, cartItem) {
+        if (cartItem) updateDisplay2(cartItem);
+    });
+
+    $rootScope.$on("shoppingCartItemChanged", function (event, cartItem) {
+        if (cartItem) updateDisplay2(cartItem);
+    });
+
+    $rootScope.$on("shoppingCartItemRemoved", function (event, cartItem) {
+        if (cartItem) updateDisplay2(cartItem);
+    });
+};
 
 var initServices = function ($rootScope, $injector) {
 
@@ -144,6 +191,9 @@ var initServices = function ($rootScope, $injector) {
     var posPeriodService = $injector.get('posPeriodService');
     posPeriodService.initPeriodListener();
     posPeriodService.startPeriodDaemon();
+
+    var taxesService = $injector.get('taxesService');
+    taxesService.initTaxCache();
 };
 
 var init = function ($rootScope, $location, $q, $http, ipService, zposService, $translate, $uibModal) {

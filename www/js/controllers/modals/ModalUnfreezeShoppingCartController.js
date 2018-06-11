@@ -1,4 +1,4 @@
-﻿app.controller('ModalUnfreezeShoppingCartController', function ($scope, $rootScope, $uibModalInstance, shoppingCartService, shoppingCartModel, $translate, orderShoppingCartService) {
+﻿app.controller('ModalUnfreezeShoppingCartController', function ($scope, $rootScope, $uibModalInstance, $mdMedia, shoppingCartService, shoppingCartModel, $translate, orderShoppingCartService) {
     var tryGetFreezed = 0;
     var isClosed = false;
 
@@ -7,6 +7,7 @@
     $scope.init = function () {
         $scope.initFreezed();
         $scope.initOrder();
+        $scope.$mdMedia = $mdMedia;
     };
 
     $scope.initFreezed = function () {

@@ -4,104 +4,137 @@ app.directive('categoryRepeat', function ($rootScope, $compile, $filter) {
         restrict: 'E',
         scope: true,
         link: function (scope, element) {
-            var template = "";
-            // Composer le template en bouclant dans les datas
-            console.log(scope.model);
-            /** Subcategories header*/
-            if (scope.model.subCategories && scope.model.subCategories.length > 0) {
-                var subCatHeader = "";
-                // ATTENTION : le responsive marchera pas, le mode pad / pos est determiné par le layout a l'initialisation
-                var className = scope.$mdMedia('gt-sm') ? 'subCategoriesHeading-pos' : 'subCategoriesHeading-pad';
-                subCatHeader += `<div class="${className}" >`;
-                // Repeat dans la subcat
-                subCatHeader += `</div>`;
-            }
 
-            template += subCatHeader;
+            /*scope.$watch('deliveryType', function (deliveryType) {
+                element.empty();*/
 
-            var mainProducts = "";
-            for (var product of scope.model.category.products) {
-                console.log(product);
-                mainProducts += `<div style="margin-bottom:4px">
+            function repeatProducts(products) {
+                if (products) {
+                    var result = "";
+                    result += "<section class='layout-row layout-wrap'>";
+                    for (var product of products) {
+                        result += `<div style="margin-bottom:4px">
                     <div aria-label="product button" class="productboxIZIPASS `;
-                if (product.DisableBuyButton) {
-                    mainProducts += ` disabled`;
-                }
-                if ($rootScope.UserPreset) {
-                    if ($rootScope.UserPreset.ItemSize == 1 || $rootScope.UserPreset.ItemSize && !scope.$mdMedia('gt-sm')) {
-                        mainProducts += ` small"`;
-                    } else if ($rootScope.UserPreset.ItemSize == 2 && !scope.$mdMedia('gt-sm')) {
-                        mainProducts += ` medium"`;
-                    } else if ($rootScope.UserPreset.ItemSize == 3 && !scope.$mdMedia('gt-sm')) {
-                        mainProducts += ` big"`;
-                    }
-                }
+                        if (product.DisableBuyButton) {
+                            result += ` disabled`;
+                        }
+                        if ($rootScope.UserPreset) {
+                            if ($rootScope.UserPreset.ItemSize == 1 || $rootScope.UserPreset.ItemSize && !scope.$mdMedia('gt-sm')) {
+                                result += ` small`;
+                            } else if ($rootScope.UserPreset.ItemSize == 2 && !scope.$mdMedia('gt-sm')) {
+                                result += ` medium`;
+                            } else if ($rootScope.UserPreset.ItemSize == 3 && !scope.$mdMedia('gt-sm')) {
+                                result += ` big`;
+                            }
+                        } else if (!scope.$mdMedia('gt-sm')) {
+                            result += ` small`;
 
-                mainProducts += ` md-no-ink onclick="$('#IZIPASSController').scope().addToCart()" >`;
-                if ($rootScope.UserPreset && $rootScope.UserPreset.ItemSize != 0) {
-                    mainProducts +=
-                        `<div layout="column" layout-fill>
+                        }
+                        result += `" onclick="$('#IZIPASSController').scope().addToCart(${product.Id})" >`;
+                        result +=
+                            `<div class="layout-column layout-fill">
                         <div class="imageContainer">
-                            <img alt="" src="${product.DefaultPictureUrl}" class="image">
+                            <img alt="" src='${product.DefaultPictureUrl}' class="image">
                         </div>
                         <div class="titleRow">  
                             ${product.Name}
                         </div>
                         <div class="price">`;
-                    if (!product.DisableBuyButton && product.Price && !product.EmployeeTypePrice) {
-                        mainProducts += `<span> ${$filter('CurrencyFormat')(product.Price)} </span>`;
+                        if (!product.DisableBuyButton && product.Price && !product.EmployeeTypePrice) {
+                            /*
+                            if(deliveryType) {
+                                switch (deliveryType) {
+                                    case 0:
+                                        // Sur place
+                                        result += `<span> ${$filter('CurrencyFormat')(product.Price)} </span>`;
+                                        break;
+                                    case 1:
+                                        result += `<span style="color: green"> ${$filter('CurrencyFormat')(product.TakeawayPrice ? product.TakeawayPrice : product.Price)} </span>`;
+                                        break;
+                                    case 2:
+                                        result += `<span style="color: blue"> ${$filter('CurrencyFormat')(product.DeliveryPrice ? product.DeliveryPrice : product.Price)} </span>`;
+                                        break;
+                                    default:
+                                        result += `<span> ${$filter('CurrencyFormat')(product.Price)} </span>`;
+                                        break;
+
+                                }
+                            } else {
+                                result += `<span> ${$filter('CurrencyFormat')(product.Price)} </span>`;
+                            }*/
+
+                            result += `<span> ${$filter('CurrencyFormat')(product.Price)} </span>`;
+
+
+                        }
+                        if (!product.DisableBuyButton && product.EmployeeTypePrice) {
+                            result += `<span translate>Saisir le prix</span>`;
+                        }
+                        if (product.DisableBuyButton) {
+                            result += `<span translate>Rupture</span>`;
+                        }
+                        result += `</div></div>`;
+                        result += "</div></div></div></div>";
                     }
-                    if (!product.DisableBuyButton && product.EmployeeTypePrice) {
-                        mainProducts += `<span translate>Saisir le prix</span>`;
-                    }
-                    if (product.DisableBuyButton) {
-                        mainProducts += `<span translate>Rupture</span>`;
-                    }
-                    mainProducts += `</div></div>`;
+                    result += "</section>";
+                    return result;
                 }
-                /*
-                if (!$rootScope.UserPreset || $rootScope.UserPreset.ItemSize == 0) {
-                    mainProducts += "<div layout=\"column\" layout-fill>" +
-                        "<div class=\"titleRow\">" + product.Name +
-                        "</div>" +
-                        "<span flex></span>" +
-                        "<div class=\"descriptionRow\" layout=\"row\">" +
-                        "<img alt=\"\" src=\"" + product.DefaultPictureUrl + "\" class=\"image\">" +
-                        "<span flex></span>";
-                    if (product.price) {
-                        mainProducts += "<div class=\"price\">" + $filter('CurrencyFormat')(product.Price) + "</div>";
-                    }
-                    mainProducts += "</div><div>";
-                    if (!product.DisableBuyButton && product.ProductAttributes.length == 0 && !product.EmployeeTypePrice) {
-                        mainProducts += "<div class=\"action\" title=\"Ajouter au panier\">" +
-                            "<span class=\"action-text\" translate>" +
-                            "Ajouter au ticket" +
-                            "</span></div>";
-                    }
-                    if (!product.DisableBuyButton && product.ProductAttributes.length > 0 && !product.EmployeeTypePrice) {
-                        mainProducts += "<div class=\"action\" title=\"Choisir produit\">" +
-                            "<span class=\"action-text\" translate>" +
-                            "Choisir produit" +
-                            "</span></div>";
-                    }
-                    if (!product.DisableBuyButton && product.ProductAttributes.length == 0 && product.EmployeeTypePrice) {
-                        mainProducts += "<div class=\"action\" title=\"Saisir le prix\">" +
-                            "<span class=\"action-text\" translate>" +
-                            "Saisir le prix" +
-                            "</span></div>";
-                    }
-                    if (product.DisableBuyButton) {
-                        mainProducts += "<div class=\"action disabled\" title=\"Rupture\">" +
-                            "<span class=\"action-text\" translate>" +
-                            "Rupture" +
-                            "</span></div>";
-                    }
-                }*/
-                mainProducts += "</div></div></div></div>";
-                template += mainProducts;
             }
 
+            var template = "";
+            // Composer le template en bouclant dans les datas
+            /** Subcategories header*/
+            if (scope.model.subCategories && scope.model.subCategories.length > 0) {
+                var subCatHeader = "";
+                // ATTENTION : le responsive marchera pas, le mode pad / pos est determiné par le layout a l'initialisation
+                var className = 'subCategoriesHeading';
+                subCatHeader += `<div class="quickAccess ${className}" >`;
+                subCatHeader += `<button class="md-raised md-button md-ink-ripple navigAction scHeadingButton"
+                                         onclick="$('#IZIPASSController').scope().scrollTo('Main')">
+                                    <i class="glyphicon glyphicon-star"></i>
+                                 </button>`;
+                for (var subCat of scope.model.subCategories) {
+                    subCatHeader += `<button class="md-raised md-button md-ink-ripple navigAction scHeadingButton"
+                                             onclick="$('#IZIPASSController').scope().scrollTo(${subCat.Id})">
+                                        ${subCat.Name}
+                                     </button>`;
+                }
+                // Repeat dans la subcat
+                subCatHeader += `</div>`;
+                template += subCatHeader;
+            }
+
+            var allCategories = "<section id='allCategories' class='layout-column flex-85' style='overflow: scroll; max-height: 100%'>";
+
+            /** Main category products*/
+            var mainProducts = "<section id='cMain'>";
+            mainProducts += `<h1> ${scope.model.category.Name} </h1>`;
+
+            mainProducts += repeatProducts(scope.model.category.products);
+
+            mainProducts += "</section>";
+            allCategories += mainProducts;
+
+            if (scope.model.subCategories) {
+                scope.model.subCategories.forEach(function (subCat) {
+                    if (subCat.products && subCat.products.length > 0) {
+                        var subCatProducts = `<section id='c${subCat.Id}'>`;
+                        subCatProducts += `<h2> ${subCat.Name} </h2>`;
+                        subCatProducts += repeatProducts(subCat.products);
+                        subCatProducts += "</section>";
+                        allCategories += subCatProducts;
+                    }
+
+                });
+            }
+
+
+            allCategories += "</section>";
+
+            template += allCategories;
+
             element.append(template);
+            //});
         }
     }
 });

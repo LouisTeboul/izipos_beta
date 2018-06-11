@@ -5,20 +5,21 @@
 
     <div class="modal-body" layout="column" flex>
         <md-tabs md-selected="mapSelectedIndex" md-border-bottom flex class="tabFill">
-            <md-tab ng-repeat="map in storeMap.data" label="{{map.Name}}">
+            <md-tab ng-repeat="map in ::storeMap.data" label="{{map.Name}}">
                 <md-tabs md-selected="map.areaSelectedIndex" md-border-bottom>
-                    <md-tab ng-repeat="area in map.Areas"
+                    <md-tab ng-repeat="area in ::map.Areas"
                             label="{{area.Name}}">
                         <div layout="row" layout-wrap flex>
                             <md-grid-list ng-show="!isLoading" md-cols="4" md-row-height="1:1" md-row-height-gt-md="1:1"
                                           md-cols-gt-sm="6" md-cols-gt-md="8" md-gutter="8px" flex>
                                 <md-grid-tile ng-show="table.ihm.enabled"
-                                              ng-repeat="table in currentArea.Objects | orderBy:'TableNumber'"
+                                              ng-repeat="table in ::currentArea.Objects | orderBy:'TableNumber'"
                                               id="t{{table.Id}}"
                                               style="background-color: {{table.options.fill}}"
                                               ng-click="selectTable(table)">
                                     <div layout="column"
-                                         ng-class="{'layout-align-center-center' : $mdMedia('gt-xs'), 'layout-align-start-end':$mdMedia('xs')}"
+                                         class="tableTile"
+                                         ng-class="{'layout-align-center-center' : $mdMedia('gt-xs'), 'layout-align-start-center':$mdMedia('xs')}"
                                          layout-fill>
                                         <h1 style="margin:0;color:white;font-weight:bold;">{{table.TableNumber}}</h1>
                                         <md-icon ng-if="$mdMedia('gt-xs')"
@@ -42,7 +43,7 @@
                                         <x translate>Tous</x>
                                     </md-checkbox>
                                     <md-checkbox ng-disabled="tableModel.allCriteriasSelected"
-                                                 ng-repeat="criteria in tableModel.criterias" class="checkbox-criterias"
+                                                 ng-repeat="criteria in ::tableModel.criterias" class="checkbox-criterias"
                                                  ng-checked="criteria.IsSelected" ng-click="toggleCriteria(criteria)">
                                         {{criteria.Name}}
                                     </md-checkbox>

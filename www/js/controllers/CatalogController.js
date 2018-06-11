@@ -23,7 +23,7 @@
 });
 
 
-app.controller('CatalogController', function ($scope, $rootScope, $state, $uibModal, $location, Idle, shoppingCartModel, posLogService, ngToast, $mdSidenav, $mdMedia, orderShoppingCartService, $uibModalStack, $translate) {
+app.controller('CatalogController', function ($scope, $rootScope, $state, $uibModal, $location, $uibModalStack, $translate, $mdSidenav, $mdMedia, Idle, shoppingCartModel, posLogService, ngToast, orderShoppingCartService) {
     var watchHandler = undefined;
     var dbOrderChangedHandler = undefined;
     var state = $state;
@@ -101,11 +101,15 @@ app.controller('CatalogController', function ($scope, $rootScope, $state, $uibMo
     });
 
     //#region Actions
+    /*
     $scope.addToCart = function (product) {
-        if (!product.DisableBuyButton) {
-            shoppingCartModel.addToCart(product);
+        if(product){
+            console.log(product);
+            if (!product.DisableBuyButton) {
+                shoppingCartModel.addToCart(product);
+            }
         }
-    };
+    };*/
 
     $scope.getNbItems = function () {
         return shoppingCartModel.getNbItems();

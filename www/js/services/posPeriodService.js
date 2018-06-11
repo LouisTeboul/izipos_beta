@@ -644,6 +644,8 @@
                 }, function (errPV) {
                     paymentValuesDefer.reject(errPV);
                 });
+            }, function (errZP) {
+                paymentValuesDefer.reject(errZP);
             });
 
 

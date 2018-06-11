@@ -1,11 +1,75 @@
-﻿app.controller('ModalClosePosController', function ($scope, $rootScope, $uibModal, $uibModalInstance, settingService, shoppingCartService, eventService, cashMovementService, zposService, $translate, posPeriodService, closePosParameters, modalStats, posUserService, posService, $http) {
+﻿app.controller('ModalClosePosController', function ($scope, $rootScope, $http, $uibModal, $uibModalInstance, $translate, $q, settingService, shoppingCartService, eventService, cashMovementService, zposService, posPeriodService, closePosParameters, modalStats, posUserService, posService) {
     $scope.closePosParameters = closePosParameters;
     $scope.paymentType = PaymentType;
 
-    $scope.init = function (reload = false, savedModel = {}) {
-        if (savedModel) {
-            console.log(savedModel);
+    var checkValidateLock = function () {
+        setTimeout(function () {
+            $scope.model.hardwareIdModels.forEach(function (hidMdl) {
+                function checkYperiod(ypid) {
+                    var checkDefer = $q.defer();
+                    var db = $rootScope.remoteDbZPos;
+                    db.find({
+                        selector: {
+                            _id: {$regex: 'ShoppingCart_1_*'},
+                            "data.yPeriodId": ypid
+                        }
+                    }).then((resTick) => {
+                        db.find({
+                            selector: {
+                                _id: {$regex: 'PaymentValues_2_*'},
+                                "data.yPeriodId": ypid
+                            }
+                        }).then((resPv) => {
+                            if (resPv.docs[0].data.Count === resTick.docs.length) {
+                                checkDefer.resolve(false);
+                            } else {
+                                checkDefer.resolve(true);
+                            }
+                        })
+                    });
+                    return checkDefer.promise;
+                }
 
+                if (hidMdl.ypid) {
+                    checkYperiod(hidMdl.ypid).then((res) => {
+                        $rootScope.validateLock = res;
+                    })
+                } else {
+                    var db = new PouchDB(`http://${$rootScope.IziBoxConfiguration.LocalIpIziBox}:5984/utils`);
+                    db.find({
+                        selector: {
+                            _id: {$regex: 'YPeriod_2_*'},
+                            "data.hardwareId": hidMdl.hid
+                        }
+                    }).then((res) => {
+                        var validArray = [];
+                        res.docs.forEach((yp, idx, arr) => {
+                            checkYperiod(yp.data.id).then((res) => {
+                                validArray.push(res);
+                                if (idx === arr.length - 1) {
+                                    var testUnlock = (val) => {
+                                        return val === false
+                                    };
+                                    if (validArray.every(testUnlock)) {
+                                        $rootScope.validateLock = false;
+                                    }
+                                }
+                            });
+                        });
+                    })
+                }
+            });
+
+            if ($rootScope.validateLock) {
+                // Si la validation est toujours lock, on recheck toutes les 5s
+                checkValidateLock()
+            }
+        }, 5000);
+    };
+
+    $scope.init = function (reload = false, savedModel = {}) {
+        checkValidateLock();
+        if (savedModel) {
             function getmatchedPmTotal(hid, paymentType) {
                 var matchedHidMdl = Enumerable.from(savedModel).firstOrDefault(function (hidModel) {
                     return hidModel.hid == hid;
@@ -579,120 +643,160 @@
         });
     };
 
+    var closeEventNF = function (updPaymentModes) {
+        //Cloture NF
+        // Logging the event
+        var event = {
+            Code: 170,
+            Description: "Clotûre de caisse",
+            OperatorCode: $rootScope.PosUserId,
+            TerminalCode: $rootScope.PosLog.HardwareId,
+            Type: "Fonds de caisse",
+            Informations: []
+        };
+
+
+        Enumerable.from(updPaymentModes).forEach(function (pm) {
+            event.Informations.push(pm.PaymentMode.Text + "(" + pm.Count + "):" + pm.TotalKnown);
+        });
+
+        eventService.sendEvent(event);
+    };
+
+    var emptyCashYperiod = function (updPaymentModes) {
+        // Si vider le cash, création d'un mouvement fermeture
+        if ($scope.model.emptyCash) {
+            posPeriodService.emptyCashYPeriodAsync($scope.closePosParameters.yperiod, updPaymentModes).then(function () {
+                closeEventNF(updPaymentModes);
+                $uibModalInstance.close();
+            }, function (err) {
+                message = err ? err : $translate.instant("Erreur lors de la fermeture");
+                sweetAlert({title: message}, function () {
+                });
+            });
+        }
+        else {
+            closeEventNF(updPaymentModes);
+            $uibModalInstance.close();
+        }
+    };
+
     var closeCashMachine = function (nbFreeze) {
-        var textFreeze = nbFreeze && nbFreeze > 0 ? "Vous avez " + nbFreeze + " ticket en attente" : "";
-        swal({
-                title: $translate.instant($scope.closePosParameters.mode.text),
-                text: textFreeze,
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d83448",
-                confirmButtonText: $translate.instant("Oui"),
-                cancelButtonText: $translate.instant("Non"),
-                closeOnConfirm: true
-            },
-            function () {
-                var updPaymentModes = [];
+        if (!$rootScope.modelPos.iziboxConnected) {
+            sweetAlert({title: $translate.instant("La izibox n'est pas accèssible")}, function () {
+            });
+        }
+        else {
+            var textFreeze = nbFreeze && nbFreeze > 0 ? "Vous avez " + nbFreeze + " ticket en attente" : "";
+            swal({
+                    title: $translate.instant($scope.closePosParameters.mode.text),
+                    text: textFreeze,
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d83448",
+                    confirmButtonText: $translate.instant("Oui"),
+                    cancelButtonText: $translate.instant("Non"),
+                    closeOnConfirm: true
+                },
+                function () {
+                    var updPaymentModes = [];
 
-                switch ($scope.closePosParameters.mode.idMode) {
-                    case 1:
-                        //Fermeture de service
-                        // Récupération des montants saisies pour les stocker dans le yPeriod
-                        var hardwareIdModel = Enumerable.from($scope.model.hardwareIdModels).firstOrDefault(function (hidModel) {
-                            return hidModel.hid == $scope.closePosParameters.hid;
-                        });
-
-                        posPeriodService.closeYPeriodAsync($scope.closePosParameters.yperiod, hardwareIdModel.CashMovementLines, $scope.model.emptyCash).then(function () {
-                            // Si vider le cash, création d'un mouvement fermeture
-                            if ($scope.model.emptyCash) {
-                                posPeriodService.emptyCashYPeriodAsync($scope.closePosParameters.yperiod, hardwareIdModel.CashMovementLines);
-                            }
-                        });
-
-                        updPaymentModes = hardwareIdModel.CashMovementLines;
-
-                        break;
-                    case 2:
-                        //Fermeture de caisse
-                        var yPeriod = Enumerable.from($scope.closePosParameters.yperiods).firstOrDefault(function (yP) {
-                            return yP.hardwareId == $scope.closePosParameters.hid && !yP.endDate;
-                        });
-
-                        if (yPeriod) {
+                    switch ($scope.closePosParameters.mode.idMode) {
+                        case 1:
+                            //Fermeture de service
                             // Récupération des montants saisies pour les stocker dans le yPeriod
                             var hardwareIdModel = Enumerable.from($scope.model.hardwareIdModels).firstOrDefault(function (hidModel) {
                                 return hidModel.hid == $scope.closePosParameters.hid;
                             });
-                            posPeriodService.closeYPeriodAsync(yPeriod, hardwareIdModel.CashMovementLines, $scope.model.emptyCash).then(function () {
+
+                            posPeriodService.closeYPeriodAsync($scope.closePosParameters.yperiod, hardwareIdModel.CashMovementLines, $scope.model.emptyCash).then(function () {
                                 // Si vider le cash, création d'un mouvement fermeture
-                                if ($scope.model.emptyCash) {
-                                    posPeriodService.emptyCashYPeriodAsync(yPeriod, hardwareIdModel.CashMovementLines);
-                                }
+                                emptyCashYperiod(hardwareIdModel.CashMovementLines);
+
+                            }, function (err) {
+                                message = err ? err : $translate.instant("La izibox n'est pas accèssible");
+                                sweetAlert({title: message}, function () {
+                                });
                             });
-                        }
 
-                        updPaymentModes = hardwareIdModel.CashMovementLines;
+                            break;
+                        case 2:
+                            //Fermeture de caisse
+                            var yPeriod = Enumerable.from($scope.closePosParameters.yperiods).firstOrDefault(function (yP) {
+                                return yP.hardwareId == $scope.closePosParameters.hid && !yP.endDate;
+                            });
 
-                        break;
-                    case 3:
-                        //Fermeture de Z
+                            if (yPeriod) {
+                                // Récupération des montants saisies pour les stocker dans le yPeriod
+                                var hardwareIdModel = Enumerable.from($scope.model.hardwareIdModels).firstOrDefault(function (hidModel) {
+                                    return hidModel.hid == $scope.closePosParameters.hid;
+                                });
+                                posPeriodService.closeYPeriodAsync(yPeriod, hardwareIdModel.CashMovementLines, $scope.model.emptyCash).then(function () {
+                                    // Si vider le cash, création d'un mouvement fermeture
+                                    emptyCashYperiod(hardwareIdModel.CashMovementLines);
+                                }, function (err) {
+                                    message = err ? err : $translate.instant("La izibox n'est pas accèssible");
+                                    sweetAlert({title: message}, function () {
+                                    });
+                                });
+                            }
 
-                        // Pour chaque caisse faire envoyer au BO les valeurs saisie lors de la fermeture
-                        Enumerable.from($scope.model.hardwareIdModels).forEach(function (hidModel) {
+                            break;
+                        case 3:
+                            //Fermeture de Z
 
-                            var closPosVal = clone($scope.closePosValues);
+                            // Fermeture de la période
+                            posPeriodService.closeZPeriodAsync($scope.closePosParameters.zperiod).then(function () {
 
-                            // Set the good harwareId
-                            closPosVal.HardwareId = hidModel.hid;
-                            // Set the value
-                            closPosVal.CashMovementLines = hidModel.CashMovementLines;
+                                // Pour chaque caisse faire envoyer au BO les valeurs saisie lors de la fermeture
+                                Enumerable.from($scope.model.hardwareIdModels).forEach(function (hidModel) {
 
-                            Enumerable.from(hidModel.CashMovementLines).forEach(function (cm) {
-                                var cmExist = Enumerable.from(updPaymentModes).firstOrDefault(function (pm) {
-                                    return pm.PaymentMode.Text == cm.PaymentMode.Text;
+                                    updPaymentModes = [];
+
+                                    var closPosVal = clone($scope.closePosValues);
+
+                                    // Set the good harwareId
+                                    closPosVal.HardwareId = hidModel.hid;
+                                    // Set the value
+                                    closPosVal.CashMovementLines = hidModel.CashMovementLines;
+
+                                    Enumerable.from(hidModel.CashMovementLines).forEach(function (cm) {
+                                        var cmExist = Enumerable.from(updPaymentModes).firstOrDefault(function (pm) {
+                                            return pm.PaymentMode.Text == cm.PaymentMode.Text;
+                                        });
+
+                                        if (cmExist) {
+                                            cmExist.Count += cm.Count;
+                                            cmExist.TotalKnown += cm.TotalKnown;
+                                        } else {
+                                            updPaymentModes.push(clone(cm));
+                                        }
+                                    });
+
+                                    cashMovementService.saveMovementAsync(closPosVal).then(function () {
+                                        closeEventNF(updPaymentModes);
+                                        $uibModalInstance.close();
+                                    }, function (err) {
+                                        var message = err ? err : $translate.instant("Erreur lors de la fermeture");
+                                        sweetAlert({title: message}, function () {
+                                        });
+                                    });
                                 });
 
-                                if (cmExist) {
-                                    cmExist.Count += cm.Count;
-                                    cmExist.TotalKnown += cm.TotalKnown;
-                                } else {
-                                    updPaymentModes.push(clone(cm));
-                                }
+                            }, function (err) {
+                                var message = err ? err : $translate.instant("La izibox n'est pas accèssible");
+                                sweetAlert({title: message}, function () {
+                                });
                             });
 
-                            cashMovementService.saveMovementAsync(closPosVal);
-                        });
+                            break;
+                    }
 
-                        // Fermeture de la période
-                        posPeriodService.closeZPeriodAsync($scope.closePosParameters.zperiod);
-                        break;
-                }
-
-                //Cloture NF
-                // Logging the event
-                var event = {
-                    Code: 170,
-                    Description: "Clotûre de caisse",
-                    OperatorCode: $rootScope.PosUserId,
-                    TerminalCode: $rootScope.PosLog.HardwareId,
-                    Type: "Fonds de caisse",
-                    Informations: []
-                };
-
-
-                Enumerable.from(updPaymentModes).forEach(function (pm) {
-                    event.Informations.push(pm.PaymentMode.Text + "(" + pm.Count + "):" + pm.TotalKnown);
+                    setTimeout(function () {
+                        $rootScope.closeKeyboard();
+                    }, 500);
+                }, function () {
                 });
-
-                eventService.sendEvent(event);
-
-                $uibModalInstance.close();
-
-                setTimeout(function () {
-                    $rootScope.closeKeyboard();
-                    $rootScope.closeKeyboard();
-                }, 500);
-            }, function () {
-            });
+        }
     }
 });

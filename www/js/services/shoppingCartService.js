@@ -186,12 +186,12 @@ app.service('shoppingCartService', ["$http", "$rootScope", "$q", "$filter", "zpo
          */
         this.freezeShoppingCartAsync = function (shoppingCart) {
             var freezeDefer = $q.defer();
-
             // RK : Appeller la fonction d'incrément d'enfant dans le parc
             RKIncrement(shoppingCart);
 
             shoppingCart.rev = undefined;
             shoppingCart.id = shoppingCart.Timestamp;
+            shoppingCart.hasBeenFrozen = true;
 
             $rootScope.dbFreeze.rel.save('ShoppingCart', shoppingCart).then(function (result) {
                 freezeDefer.resolve(true);
@@ -448,9 +448,9 @@ app.service('shoppingCartService', ["$http", "$rootScope", "$q", "$filter", "zpo
             -Multiplie par 3000 pour avoir le timeout
             */
 
-            var timeout = nbStep * 3000;
+            var timeout = nbStep ? nbStep * 3000 : 20000;
 
-            printDefer.resolve();
+            // printDefer.resolve();
             $http.post(printerApiUrl, shoppingCartPrinterReq, {timeout: timeout}).then(function (obj) {
                 console.log("succes post ticket", obj);
                 //Set the coucbDb Id and the timestamp that come from the box
@@ -465,6 +465,8 @@ app.service('shoppingCartService', ["$http", "$rootScope", "$q", "$filter", "zpo
                         shoppingCartPrinterReq.ShoppingCart.Timestamp = data.timestamp;
                     }
                 }
+                // Lock la validation
+                $rootScope.validateLock = true;
                 printDefer.resolve(shoppingCartPrinterReq);
             }, function (err) {
                 console.log("erreur", err);

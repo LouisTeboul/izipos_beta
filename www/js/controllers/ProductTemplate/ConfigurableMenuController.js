@@ -20,6 +20,31 @@
 
 
 app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stateParams, $location, categoryService, settingService, productService, pictureService, shoppingCartModel) {
+    var deliveryType = shoppingCartModel.getDeliveryType();
+    $rootScope.$on('deliveryTypeChanged', (e, newValue) => {
+        var nextDeliveryType = newValue;
+        var nextPrice;
+
+        switch (nextDeliveryType) {
+            case 0:
+                nextPrice = $scope.initialProduct.Price;
+                break;
+            case 1:
+                nextPrice = $scope.initialProduct.TakeawayPrice || $scope.initialProduct.Price;
+                break;
+            case 2:
+                nextPrice = $scope.initialProduct.DeliveryPrice || $scope.initialProduct.Price;
+                break;
+            default:
+                nextPrice = $scope.initialProduct.Price;
+                break;
+        }
+
+        $scope.TotalPrice = $scope.TotalPrice - $scope.lastPrice + nextPrice;
+        $scope.lastPrice = nextPrice;
+        deliveryType = newValue;
+
+    });
     $scope.init = function () {
         if ($rootScope.IziBoxConfiguration.StepEnabled) {
             settingService.getStepNamesAsync().then(function (stepNames) {
@@ -31,7 +56,7 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
     var currentProductHandler = $rootScope.$watch('currentConfigurableProduct', function () {
 
         if ($rootScope.currentConfigurableProduct) {
-            if($rootScope.borne) {
+            if ($rootScope.borne) {
                 productService.getProductForCategoryAsync([$rootScope.currentConfigurableProduct.ProductCategory.CategoryId]).then(function (products) {
 
                     $scope.initialProduct = Enumerable.from(products).firstOrDefault(function (p) {
@@ -86,13 +111,29 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
 
         //Clone instance
         $scope.product = jQuery.extend(true, {}, selectedProduct);
-        if($rootScope.borne) {
+        if ($rootScope.borne) {
             $scope.TotalPrice = $scope.initialProduct.Price;
         } else {
-            if (($rootScope.isConfigurableProductOffer == true || ($stateParams.offer && $stateParams.offer.OfferParam.Price == 0)) && !isOfferConsumed) {
+            if (($rootScope.isConfigurableProductOffer || ($stateParams.offer && $stateParams.offer.OfferParam.Price == 0)) && !isOfferConsumed) {
                 $scope.TotalPrice = 0;
             } else {
-                $scope.TotalPrice = $scope.initialProduct.Price;
+                console.log($scope.initialProduct);
+                switch (deliveryType) {
+                    case 0:
+                        $scope.TotalPrice = $scope.initialProduct.Price;
+                        break;
+                    case 1:
+                        $scope.TotalPrice = $scope.initialProduct.TakeawayPrice || $scope.initialProduct.Price;
+                        break;
+                    case 2:
+                        $scope.TotalPrice = $scope.initialProduct.DeliveryPrice || $scope.initialProduct.Price;
+                        break;
+                    default:
+                        $scope.TotalPrice = $scope.initialProduct.Price;
+                        break;
+                }
+                $scope.lastPrice = $scope.TotalPrice;
+
             }
         }
         $scope.productIsValid();
@@ -128,7 +169,7 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
     $scope.addToCart = function (product) {
         console.log($stateParams);
         shoppingCartModel.addToCart(product, true);
-        if(!$rootScope.borne) {
+        if (!$rootScope.borne) {
             $stateParams.offer = null;
         }
         loadProduct($scope.initialProduct);
@@ -156,34 +197,33 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
         var AttributeValue = Enumerable.from(Attribute.ProductAttributeValues).firstOrDefault("x => x.Id ==" + id);
         if (AttributeValue.Selected) {
             if (Attribute.IsRequired == false) {
-                if($rootScope.borne) {
+                if ($rootScope.borne) {
                     AttributeValue.Selected = false;
                     if (AttributeValue.PriceAdjustment) {
-                        $scope.TotalPrice = $scope.TotalPrice - AttributeValue.PriceAdjustment;
+                        $scope.TotalPrice -= AttributeValue.PriceAdjustment;
                     }
                 } else {
-                    if(Attribute.Type == 3) {
+                    if (Attribute.Type == 3) {
                         if (testSelectCheckbox(Attribute, AttributeValue, false)) {
-                            if (AttributeValue.PriceAdjustment) $scope.TotalPrice = $scope.TotalPrice - AttributeValue.PriceAdjustment;
+                            if (AttributeValue.PriceAdjustment) $scope.TotalPrice -= AttributeValue.PriceAdjustment;
                         }
                     }
                 }
             }
         } else {
-            if($rootScope.borne) {
+            if ($rootScope.borne) {
                 AttributeValue.Selected = true;
                 if (!reload) {
                     Attribute.Step = $scope.currentStep;
 
-                    if (AttributeValue.LinkedProduct && AttributeValue.LinkedProduct.ProductComments && AttributeValue.LinkedProduct.ProductComments.length > 0)
-                    {
+                    if (AttributeValue.LinkedProduct && AttributeValue.LinkedProduct.ProductComments && AttributeValue.LinkedProduct.ProductComments.length > 0) {
                         shoppingCartModel.editComment(AttributeValue);
                     }
 
                 } else {
                     if (!Attribute.Step) Attribute.Step = $scope.currentStep;
                 }
-                if (AttributeValue.PriceAdjustment) $scope.TotalPrice = $scope.TotalPrice + AttributeValue.PriceAdjustment;
+                if (AttributeValue.PriceAdjustment) $scope.TotalPrice += AttributeValue.PriceAdjustment;
                 $scope.$evalAsync();
             } else {
                 if (testSelectCheckbox(Attribute, AttributeValue, true)) {
@@ -198,7 +238,7 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
                     else {
                         if (!Attribute.Step) Attribute.Step = $scope.currentStep;
                     }
-                    if (AttributeValue.PriceAdjustment) $scope.TotalPrice = $scope.TotalPrice + AttributeValue.PriceAdjustment;
+                    if (AttributeValue.PriceAdjustment) $scope.TotalPrice += AttributeValue.PriceAdjustment;
                     $scope.$evalAsync();
                 }
             }
@@ -210,7 +250,7 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
                 var item = Attribute.ProductAttributeValues[i];
                 if (item.Selected && item.Id != id) {
                     item.Selected = false;
-                    $scope.TotalPrice = $scope.TotalPrice - item.PriceAdjustment;
+                    $scope.TotalPrice -= item.PriceAdjustment;
                 }
             }
         }
