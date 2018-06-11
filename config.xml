@@ -29,7 +29,6 @@
     <plugin name="cordova-plugin-device" spec="~1.1.7" />
     <plugin name="cordova-plugin-transport-security" spec="~0.1.2" />
     <plugin name="cordova-plugin-statusbar" spec="^2.3.0" />
-	<plugin name="cordova-sqlite-storage" spec="~2.3.2" />
     <icon platform="ios" src="resources/icon.png" />
     <platform name="ios">
         <icon gap:platform="ios" height="228" src="resources/ios/icon/Icon-App-76x76@3x.png" width="228" />
@@ -69,4 +68,5 @@
         <splash density="port-xxhdpi" src="resources/android/splash/drawable-port-xxhdpi-screen.png" />
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     </platform>
+    <plugin name="cordova-plugin-sqlite-2" spec="~1.0.4" />
 </widget>
