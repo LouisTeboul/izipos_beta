@@ -19,10 +19,10 @@
         setupDatabases($rootScope, $q, zposService, posService);
     }
 };
-
+var adapter = !!window.sqlitePlugin ? 'cordova-sqlite' : 'websql';
 
 var settingsPouchDB = {
-    typeDB: 'cordova-sqlite',
+    typeDB: adapter,
     opts: { live: true, retry: true, batch_size: 50, batches_limit: 100, heartbeat: 5000 },
     optsReplicate: { live: true, retry: true, batch_size: 10, batches_limit: 8, heartbeat: 5000 },
     optsSync: { live: false, retry: false, batch_size: 10, batches_limit: 8 },
@@ -30,12 +30,11 @@ var settingsPouchDB = {
 };
 
 document.addEventListener('deviceready', () => {
-    var settingsPouchDB = {
+    settingsPouchDB = {
         //mobileAdapter: 'cordova-sqlite',
-        typeDB: 'cordova-sqlite',
-        opts: { live: true, retry: true, batch_size: 50, batches_limit: 100, heartbeat: 5000 },
-        optsReplicate: { live: true, retry: true, batch_size: 10, batches_limit: 8, heartbeat: 5000 },
-        optsSync: { live: false, retry: false, batch_size: 10, batches_limit: 8 },
+        typeDB: adapter,
+        opts: {live: true, retry: true, batch_size: 50, batches_limit: 100},
+        optsReplicate: {live: true, retry: true, batch_size: 10, batches_limit: 8}
     };
 });
 

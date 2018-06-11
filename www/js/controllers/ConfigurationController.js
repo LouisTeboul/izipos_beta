@@ -72,9 +72,10 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
         if (!$rootScope.PrinterConfiguration.ProdPrinter) $rootScope.PrinterConfiguration.ProdPrinter = 1;
 
         document.addEventListener('deviceready', () => {
-            var settingsPouchDB = {
+            var adapter = !!window.sqlitePlugin ? 'cordova-sqlite' : 'websql';
+            settingsPouchDB = {
                 //mobileAdapter: 'cordova-sqlite',
-                typeDB: 'cordova-sqlite',
+                typeDB: adapter,
                 opts: {live: true, retry: true, batch_size: 50, batches_limit: 100},
                 optsReplicate: {live: true, retry: true, batch_size: 10, batches_limit: 8}
             };
