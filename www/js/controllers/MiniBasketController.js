@@ -154,7 +154,9 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
 
 
         $scope.setDeliveryType = function (value) {
-            if (value !== 0 && $rootScope.IziBoxConfiguration.OrderPopUpOnDeliveryChange) {
+            if (value !== 0 &&
+                ($rootScope.IziBoxConfiguration.OrderPopUpOnDeliveryChange ||
+                    $rootScope.UserPreset && $rootScope.UserPreset.PhoneOrder && $rootScope.UserPreset.PhoneOrder.Popup)) {
                 shoppingCartModel.editDeliveryInfos();
             }
 
@@ -485,7 +487,7 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
 
         $scope.selectPaymentMode = function (selectedPaymentMode) {
 
-            if($scope.currentShoppingCart.Residue > 0) {
+            if ($scope.currentShoppingCart.Residue > 0) {
                 // Attention à la fonction d'arrondi
                 var customValue = $scope.totalDivider > 1 ? parseFloat((Math.round($scope.currentShoppingCart.Total / $scope.totalDivider * 100) / 100).toFixed(2)) : undefined;
 
@@ -561,6 +563,10 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
                     var iidet = new Decimal(itemIn.DiscountET);
                     matchedItem.DiscountET = parseFloat(midet.plus(iidet));
 
+                    if(Math.max(itemIn.stockQuantity, matchedItem.stockQuantity) > 0) {
+                        matchedItem.stockQuantity = Math.max(itemIn.stockQuantity, matchedItem.stockQuantity);
+                    }
+
                 } else {
                     shoppingCartTo.Items.push(itemIn)
                 }
@@ -629,36 +635,34 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
         };
 
         $scope.validShoppingCart = function (ignorePrintTicket) {
-            if (!$scope.currentShoppingCart.ParentTicket) {
-                if ($rootScope.UserPreset && $rootScope.UserPreset.ForceOnCreateTicket && $rootScope.UserPreset.ForceOnCreateTicket.Cutleries) {
-                    var modalInstance = $uibModal.open({
-                        templateUrl: 'modals/modalCutleries.html',
-                        controller: 'ModalCutleriesController',
-                        size: 'sm',
-                        resolve: {
-                            initCutleries : function () {
-                                return $scope.currentShoppingCart.TableCutleries
-                            }
-                        },
-                        backdrop: 'static',
-                    });
-
-                    modalInstance.result.then(function (nbCutleries) {
-                        shoppingCartModel.setTableCutleries(nbCutleries);
-                        if ($rootScope.IziBoxConfiguration.ForceDeliveryChoice) {
-                            shoppingCartModel.openModalDelivery(ignorePrintTicket);
-                        } else {
-                            shoppingCartModel.validShoppingCart(ignorePrintTicket);
+            if ($rootScope.UserPreset && $rootScope.UserPreset.ForceOnCreateTicket && $rootScope.UserPreset.ForceOnCreateTicket.Cutleries) {
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'modals/modalCutleries.html',
+                    controller: 'ModalCutleriesController',
+                    size: 'sm',
+                    resolve: {
+                        initCutleries: function () {
+                            return $scope.currentShoppingCart.TableCutleries
                         }
-                    }, function () {
-                        console.log('Erreur');
-                    });
-                } else {
+                    },
+                    backdrop: 'static',
+                });
+
+                modalInstance.result.then(function (nbCutleries) {
+                    shoppingCartModel.setTableCutleries(nbCutleries);
                     if ($rootScope.IziBoxConfiguration.ForceDeliveryChoice) {
                         shoppingCartModel.openModalDelivery(ignorePrintTicket);
                     } else {
                         shoppingCartModel.validShoppingCart(ignorePrintTicket);
                     }
+                }, function () {
+                    console.log('Erreur');
+                });
+            } else {
+                if ($rootScope.IziBoxConfiguration.ForceDeliveryChoice) {
+                    shoppingCartModel.openModalDelivery(ignorePrintTicket);
+                } else {
+                    shoppingCartModel.validShoppingCart(ignorePrintTicket);
                 }
             }
         };
@@ -785,7 +789,7 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
          * */
         var resizeMiniBasket = function () {
             var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-            if(w >= 800 && !$rootScope.showShoppingCart) {
+            if (w >= 800 && !$rootScope.showShoppingCart) {
                 $rootScope.showShoppingCart = true;
             }
         };
@@ -804,7 +808,7 @@ app.controller('MiniBasketController', ['$scope', '$rootScope', '$state', '$uibM
         };
 
         $scope.getNbItems = function () {
-            return shoppingCartModel.getNbItems();
+            return Math.round10(shoppingCartModel.getNbItems(), -2);
         };
 
         /** Clear the loyalty info linked to the ticket */

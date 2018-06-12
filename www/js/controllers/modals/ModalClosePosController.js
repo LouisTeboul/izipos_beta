@@ -12,7 +12,7 @@
                         selector: {
                             _id: {$regex: 'ShoppingCart_1_*'},
                             "data.yPeriodId": ypid,
-                            "data.Canceled" : false
+                            "data.Canceled": false
                         }
                     }).then((resTick) => {
                         db.find({
@@ -26,6 +26,8 @@
                             } else {
                                 checkDefer.resolve(true);
                             }
+                        }, (err) => {
+                            console.log(err);
                         })
                     });
                     return checkDefer.promise;
@@ -41,7 +43,7 @@
                         selector: {
                             _id: {$regex: 'YPeriod_2_*'},
                             "data.hardwareId": hidMdl.hid,
-                            "data.Canceled" : false
+                            "data.endDate" : null
                         }
                     }).then((res) => {
                         var validArray = [];
@@ -58,6 +60,8 @@
                                 }
                             });
                         });
+                    }, (err) => {
+                        console.log(err);
                     })
                 }
             });
@@ -316,7 +320,7 @@
                                             // Pré-renseigner du montant attendu
 
 
-                                            lineClose.PaymentMode.Total = l.PaymentMode.Total;
+                                            lineClose.PaymentMode.Total = roundValue(l.PaymentMode.Total);
                                             lineClose.TotalKnown = roundValue(l.PaymentMode.Total);
                                         }
                                         else {

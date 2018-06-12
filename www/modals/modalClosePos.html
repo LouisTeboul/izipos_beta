@@ -2,11 +2,11 @@
     <div class="modal-header">
         <h1 class="modal-title" translate>{{closePosParameters.mode.text}}</h1>
     </div>
-    <uib-tabset>
-        <uib-tab ng-repeat="hidMdl in model.hardwareIdModels ">
-            <uib-tab-heading>
+    <tabset>
+        <tab ng-repeat="hidMdl in model.hardwareIdModels ">
+            <tab-heading>
                 {{hidMdl.alias ? hidMdl.alias : hidMdl.hid}}
-            </uib-tab-heading>
+            </tab-heading>
 
             <div class="form-panel modal-body modal-closepos">
                 <div class="row" style="border-bottom: 1px solid lightgray;margin-bottom:10px">
@@ -112,7 +112,7 @@
                 <button class="btn btn-success" ng-click="cashManagement(hidMdl.hid)" translate>Gestion des espèces
                 </button>
             </div>
-        </uib-tab>
+        </tab>
         <!--<tab ng-if="closePosParameters.mode.idMode == 3 && model.hardwareIdModels.length > 1">-->
         <tab ng-if="closePosParameters.mode.idMode == 3">
             <tab-heading>
@@ -151,7 +151,7 @@
                 </div>
             </div>
         </tab>
-    </uib-tabset>
+    </tabset>
     <div class="modal-footer">
         <div class="form-check hidden"
              ng-if="closePosParameters.mode.idMode === 1 || closePosParameters.mode.idMode === 2">

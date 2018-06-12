@@ -68,7 +68,7 @@
 /*-----------------------DEFAULTS-------------------------*/
 
 * {
-    user-select : none;
+    user-select: none;
 }
 
 body {
@@ -129,13 +129,9 @@ label {
     margin-top: 30px;
 }
 
-.loading .gaugeContainer {
-    width: 180px;
-}
-
 .loading .gauge {
-    width: 180px;
-    left: 0;
+    width: 300px;
+    height: 150px;
     position: relative;
 }
 
@@ -183,10 +179,6 @@ md-input-container label:not(._md-container-ignore) {
     margin-top: 30px;
 }
 
-.loading .gauge {
-    width: 180px
-}
-
 .configuration .gaugeIziboxContainer {
     width: 450px;
     height: 320px;
@@ -202,14 +194,35 @@ md-input-container label:not(._md-container-ignore) {
     bottom: 170px;
 }
 
+.loading .gaugeValue {
+    width: 150px;
+    position: relative;
+    font-weight: bold;
+}
+
+.gaugeWrap {
+    justify-content: center !important;
+}
+
 @media (min-width: 800px) {
 
     .loading .gaugeValue {
-        bottom: 95px;
-        left: 60px;
-        position: relative;
-        font-size: 14px;
-        font-weight: bold;
+        bottom: 100px;
+        font-size: 15px;
+    }
+
+    .gaugeWrap {
+        width: auto;
+        margin-top: 100px;
+    }
+
+    .loading .gaugeContainer {
+        height: 150px;
+        width: 150px;
+        margin: 0 20px;
+    }
+    .loading .gauge {
+        margin-left: -75px;
     }
 }
 
@@ -218,8 +231,19 @@ md-input-container label:not(._md-container-ignore) {
         zoom: 70%;
     }
 
+    .loading .gauge {
+        margin-left: -25px;
+    }
+
+    .gaugeWrap {
+        width: 240px;
+        margin-top: 50px;
+    }
+
     .loading .gaugeContainer {
-        width: 150px;
+        height: 75px;
+        width: 100px;
+        margin: 25px 10px;
     }
 
     .loading .gaugeContainer .gauge {
@@ -228,10 +252,8 @@ md-input-container label:not(._md-container-ignore) {
     }
 
     .loading .gaugeValue {
-        bottom: 60px;
-        position: relative;
+        bottom: 62px;
         font-size: 12px;
-        font-weight: bold;
     }
 }
 

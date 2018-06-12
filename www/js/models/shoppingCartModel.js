@@ -27,7 +27,8 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
         this.incrementQuantity = function (cartItem) {
             cartItem.DiscountIT += cartItem.DiscountIT / cartItem.Quantity;
             cartItem.DiscountET += cartItem.DiscountET / cartItem.Quantity;
-            cartItem.Quantity += 1;
+            cartItem.Quantity++;
+            cartItem.stockQuantity++;
             this.calculateTotal();
             this.calculateLoyalty();
             $rootScope.$emit("shoppingCartItemChanged", cartItem);
@@ -37,7 +38,10 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
             if (posUserService.isEnable('DELI')) {
                 cartItem.DiscountIT -= cartItem.DiscountIT / cartItem.Quantity;
                 cartItem.DiscountET -= cartItem.DiscountET / cartItem.Quantity;
-                cartItem.Quantity -= 1;
+                cartItem.Quantity--;
+                if(cartItem.stockQuantity && cartItem.stockQuantity >= 1 ) {
+                    cartItem.stockQuantity--;
+                }
 
                 this.calculateTotal();
                 this.calculateLoyalty();
@@ -231,17 +235,21 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                         var newSplitItem = clone(cartItem);
                         newSplitItem.DiscountIT = 0;
                         newSplitItem.DiscountET = 0;
+                        newSplitItem.stockQuantity = 1;
                         newSplitItem.Quantity = 1;
                         newSplitItem.hashkey = objectHash(newSplitItem);
                         newSplitItem.isPartSplitItem = true;
+                        newSplitItem.stockQuantity = 0;
                         shoppingCartTo.Items.push(newSplitItem);
                     }
                     item.Quantity = ratio - j;
+                    item.stockQuantity = Math.floor(item.Quantity);
                     item.DiscountIT = 0;
                     item.DiscountET = 0;
                     item.isPartSplitItem = true;
                     shoppingCartTo.Items.push(item);
                 } else {
+                    item.stockQuantity = 0;
                     item.Quantity = ratio;
                     item.DiscountIT = 0;
                     item.DiscountET = 0;
@@ -255,7 +263,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                     cartItem.Quantity--;
                     //On regenere un hash
                     newCartItem.hashkey = objectHash(newCartItem);
-
+                    newCartItem.stockQuantity = 0;
                     shoppingCartFrom.Items.push(newCartItem);
                 }
                 cartItem.Quantity = cartItem.Quantity - ratio;
@@ -273,6 +281,13 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                 newPart.DiscountET /= nbPart;
                 newPart.Quantity /= nbPart;
                 newPart.hashkey = objectHash(newPart);
+                if (i == nbPart - 1) {
+                    newPart.stockQuantity = 1;
+                } else {
+                    newPart.stockQuantity = 0;
+                }
+
+
                 shoppingCart.Items.push(newPart);
             }
             this.removeItemFrom(shoppingCart, cartItem);
@@ -560,6 +575,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                     item.DiscountIT /= divider;
                     item.DiscountET /= divider;
                     item.isPartSplitItem = true;
+                    item.stockQuantity = 0;
                     item.Quantity = Math.round10((item.Quantity / divider), -5);
                 });
 
@@ -581,6 +597,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                         Enumerable.from(clonedShoppingCart.Items).forEach(function (item) {
 
                             item.Quantity = adjustDividedQuantity(item.OriginalQuantity, item.Quantity, divider);
+                            item.stockQuantity = item.OriginalQuantity;
 
                         });
 
@@ -928,6 +945,7 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                         cartItem.ProductId = product.Id;
                         cartItem.Product = product;
                         cartItem.Quantity = qty;
+                        cartItem.stockQuantity = qty;
                         cartItem.Printer_Id = product.Printer_Id;
                         cartItem.Step = currentShoppingCart.CurrentStep;
                         cartItem.IsFree = isfree;
@@ -1088,8 +1106,14 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                 $rootScope.closeLock = true;
                 // Jusqu'a ce que le PaymentValues de la Y period soit update
 
-            }, function () {
+            }, function (err) {
                 //Dans le cas ou le fetch / creation yPeriod echoue, on supprime le panier
+                console.log(err);
+                if (err.request) {
+                    console.log(err.request);
+                    err.request._id = err.request.ShoppingCart.id.toString();
+                    $rootScope.dbValidatePool.put(err.request);
+                }
                 $rootScope.hideLoading();
                 current.clearShoppingCart();
             });
@@ -1200,7 +1224,6 @@ app.service('shoppingCartModel', ['$rootScope', '$q', '$state', '$timeout', '$ui
                         });
                     }, function (err) {
                         $rootScope.hideLoading();
-                        console.log(err);
                         borneService.redirectToHome();
                     });
                 }

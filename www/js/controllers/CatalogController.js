@@ -130,7 +130,7 @@ app.controller('CatalogController', function ($scope, $rootScope, $state, $uibMo
     };*/
 
     $scope.getNbItems = function () {
-        return shoppingCartModel.getNbItems();
+        return Math.round10(shoppingCartModel.getNbItems(), -2);
     };
     //#endregion
 

@@ -42,7 +42,7 @@
 
                         <div class="unFreezeTable" layout="column" style="height: 75px;" flex>
                             <div layout="row" style="align-items: center;" flex>
-                                <div layout="row" flex>
+                                <div layout="row" style="line-height: 20px;align-items: center;" flex>
                                     <strong class="orderListTo">
                                         <input type="checkbox"
                                                ng-click="$event.stopPropagation();checkShoppingCart(shoppingCart,$event);"
@@ -74,7 +74,9 @@
                             </div>
                             <div class="productComment">
                                 <div ng-if="shoppingCart.Customer != undefined">
-                                    <strong><x translate>Horaire</x> : {{shoppingCart.ShippingOption}}</strong>
+                                    <strong>
+                                        <x translate>Horaire</x>
+                                        : {{shoppingCart.ShippingOption}}</strong>
                                     {{shoppingCart.Customer.FirstName
                                     + " " + shoppingCart.Customer.LastName
                                     + " - " + shoppingCart.Customer.Email}}
@@ -154,7 +156,7 @@
 
                         <div class="unFreezeTable" layout="column" style="height: 75px;" flex>
                             <div layout="row" style="align-items: center;" flex>
-                                <div layout="row" flex>
+                                <div layout="row" style="line-height: 20px;align-items: center;" flex>
                                     <strong class="orderListTo" style="flex:1;">
                                         <md-icon class="glyphicon" ng-class="{'glyphicon-earphone': order.DatePickup,
                                         'glyphicon-globe': order.Customer != undefined }"></md-icon>

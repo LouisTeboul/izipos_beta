@@ -19,39 +19,40 @@
 -->
 <html>
 <head>
-    <meta charset="utf-8" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="msapplication-tap-highlight" content="no" />
+    <meta charset="utf-8"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="msapplication-tap-highlight" content="no"/>
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, maximum-scale=1, minimum-scale=1" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, maximum-scale=1, minimum-scale=1"/>
     <!--<meta http-equiv="Content-Security-Policy" content="default-src * blob:;media-src * blob:;img-src * 'self' blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'" />-->
-    <meta http-equiv="Content-Security-Policy" />
+    <meta http-equiv="Content-Security-Policy"/>
     <!-- Styles -->
-    <link rel="icon" href="favicon.ico" />
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link rel="icon" href="favicon.ico"/>
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet"/>
     <!--<link href="css/lib/bootstrap-switch.min.css" rel="stylesheet" />-->
-    <link href="css/lib/angular-toggle-switch.css" rel="stylesheet" />
-    <link href="css/lib/toggle-switch.css" rel="stylesheet" />
-    <link href="css/lib/kendo.common-material.min.css" rel="stylesheet" />
-    <link href="css/lib/kendo.material.min.css" rel="stylesheet" />
-    <link href="css/lib/kendo.dataviz.min.css" rel="stylesheet" />
-    <link href="css/lib/kendo.dataviz.material.min.css" rel="stylesheet" />
-    <link href="css/lib/sweetalert.css" rel="stylesheet" />
+    <link href="css/lib/angular-toggle-switch.css" rel="stylesheet"/>
+    <link href="css/lib/toggle-switch.css" rel="stylesheet"/>
+    <link href="css/lib/kendo.common-material.min.css" rel="stylesheet"/>
+    <link href="css/lib/kendo.material.min.css" rel="stylesheet"/>
+    <link href="css/lib/kendo.dataviz.min.css" rel="stylesheet"/>
+    <link href="css/lib/kendo.dataviz.material.min.css" rel="stylesheet"/>
+    <link href="css/lib/sweetalert.css" rel="stylesheet"/>
     <!--<link href="css/main.css" rel="stylesheet" />-->
-    <link href="css/default.css" rel="stylesheet" id="styleDef" />
-    <link href="css/scrollbar.css" rel="stylesheet" />
-    <link href="css/keypad-numeric.css" rel="stylesheet" />
-    <link href="css/keypad-azerty.css" rel="stylesheet" />
-    <link href="css/lib/ngToast.min.css" rel="stylesheet" />
+    <link href="css/default.css" rel="stylesheet" id="styleDef"/>
+    <link href="css/scrollbar.css" rel="stylesheet"/>
+    <link href="css/keypad-numeric.css" rel="stylesheet"/>
+    <link href="css/keypad-azerty.css" rel="stylesheet"/>
+    <link href="css/lib/ngToast.min.css" rel="stylesheet"/>
     <!--<link href="css/lib/ngToast-animations.min.css" rel="stylesheet" />-->
-    <link href="css/lib/angular-material.min.css" rel="stylesheet" />
-    <link href="css/lib/fabricjs/mcColorPicker.css" rel="stylesheet" />
+    <link href="css/lib/angular-material.min.css" rel="stylesheet"/>
+    <link href="css/lib/fabricjs/mcColorPicker.css" rel="stylesheet"/>
 
     <!--Admin specifics styles-->
-    <link href="js/lib/AdminLibs/fullcalendar-2.6.1/fullcalendar.min.css" rel="stylesheet" />
-    <link href="js/lib/AdminLibs/angular-material-data-table/md-data-table.min.css" rel="stylesheet" />
+    <link href="js/lib/AdminLibs/fullcalendar-2.6.1/fullcalendar.min.css" rel="stylesheet"/>
+    <link href="js/lib/AdminLibs/angular-material-data-table/md-data-table.min.css" rel="stylesheet"/>
 
     <!-- Libraries -->
     <script src="js/lib/jquery.min.js"></script>
@@ -251,20 +252,23 @@
     <title>IziPos</title>
 </head>
 <body id="appbody" ng-app="app" ng-controller="AppController" ng-init="init()">
-    <div class="loader" ng-show="loading > 0"></div>
-    <toast ng-if="!borne"></toast>
-    <div class="keyboardContainer layout-row layout-align-{{keyboardLocation}}">
-        <div id="keyboard-decimal" ng-if="currentKeyboardType == 'decimal'" data-ng-keypad="keyboard-decimal" class="numpad relative">
-            <div ng-include="'partials/decimal.html'" layout-fill></div>
-        </div>
-        <div id="keyboard-numeric" ng-if="currentKeyboardType == 'numeric'" data-ng-keypad="keyboard-numeric" class="numpad relative">           
-            <div ng-include="'partials/numeric.html'" layout-fill></div>
-        </div>
-        <div id="keyboard-azerty" ng-if="currentKeyboardType == 'azerty'" data-ng-keypad="keyboard-azerty" class="azerty relative" ng-class="{'phone': $mdMedia('(min-width: 800px)') == false}">
-            <div ng-include="'partials/azerty.html'" layout-fill></div>
-        </div>
+<div class="loader" ng-show="loading > 0"></div>
+<toast ng-if="!borne"></toast>
+<div class="keyboardContainer layout-row layout-align-{{keyboardLocation}}">
+    <div id="keyboard-decimal" ng-if="currentKeyboardType == 'decimal'" data-ng-keypad="keyboard-decimal"
+         class="numpad relative">
+        <div ng-include="'partials/decimal.html'" layout-fill></div>
     </div>
-    <div layout="column" layout-fill ui-view></div>
-    <div id="loadAdmin"></div>
+    <div id="keyboard-numeric" ng-if="currentKeyboardType == 'numeric'" data-ng-keypad="keyboard-numeric"
+         class="numpad relative">
+        <div ng-include="'partials/numeric.html'" layout-fill></div>
+    </div>
+    <div id="keyboard-azerty" ng-if="currentKeyboardType == 'azerty'" data-ng-keypad="keyboard-azerty"
+         class="azerty relative" ng-class="{'phone': $mdMedia('(min-width: 800px)') == false}">
+        <div ng-include="'partials/azerty.html'" layout-fill></div>
+    </div>
+</div>
+<div layout="column" layout-fill ui-view></div>
+<div id="loadAdmin"></div>
 </body>
 </html>

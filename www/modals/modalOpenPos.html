@@ -11,20 +11,19 @@
             <div class="row" ng-if="model.message != undefined && model.message != ''"><p translate>
                 {{model.message}}</p></div>
             <div class="row" ng-if="!openPosParameters.isOpenPos">
-                <div style="width:40%;float:left">
+                <div style="float:left">
                     <div class="title">
-                        <x translate>Motif</x>
-                        :
+                        <x translate>Motif</x> :
                     </div>
                 </div>
-                <div style="width:60%;float:left">
+                <div style="float:left">
                     <div class="btn-group" dropdown is-open="status.isopen" style="width:100%">
                         <button id="single-button" type="button" style="width:270px" class="btn btn-default"
                                 dropdown-toggle ng-disabled="disabled">
                             {{model.motif.Name | NullConverter:("&lt;"+("Sélectionner un motif" | translate)+"&gt;")}}
                             <span style="margin-top:8px;float:right" class="caret"></span>
                         </button>
-                        <ul class="dropdown-menu" style="width:270px" role="menu" aria-labelledby="single-button">
+                        <ul class="dropdown-menu" style="width:250px" role="menu" aria-labelledby="single-button">
                             <li ng-repeat="m in motifs" role="menuitem" class="item"><a ng-click="selectMotif(m)">
                                 <x ng-if="m.CashIn">+</x>
                                 <x ng-if="!m.CashIn">-</x>

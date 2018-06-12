@@ -21,7 +21,7 @@ app.controller('ModalEditPresetController', function ($scope, $rootScope, $uibMo
                         flags: {
                             DisplayFid: {
                                 value: true,
-                                text: "Bandeau fidélité",
+                                text: "Bandeau fid.",
                             },
                             DisplayDelivery: {
                                 value: true,
@@ -29,7 +29,7 @@ app.controller('ModalEditPresetController', function ($scope, $rootScope, $uibMo
                             },
                             GroupProducts: {
                                 value: true,
-                                text: "Grouper les produits",
+                                text: "Grp. les produits",
                             }
 
                         },
@@ -70,6 +70,19 @@ app.controller('ModalEditPresetController', function ($scope, $rootScope, $uibMo
                                     },
                                 },
                                 text: "Affichage des boutons",
+                            },
+                            PhoneOrder: {
+                                values: {
+                                    Popup: {
+                                        value: false,
+                                        text: "Pop-up"
+                                    },
+                                    Menu: {
+                                        value: true,
+                                        text: "Bouton menu"
+                                    },
+                                },
+                                text: "Commande tel.",
                             },
                         },
                     },
