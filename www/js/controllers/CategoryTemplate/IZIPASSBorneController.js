@@ -1,4 +1,4 @@
-﻿app.config(function ($stateProvider) {
+﻿﻿app.config(function ($stateProvider) {
     $stateProvider
         .state('catalogBorne.CategoryTemplate.IZIPASS', {
             url: '/izipass/{id}',
@@ -7,7 +7,7 @@
 });
 
 
-app.controller('IZIPASSBorneController', function ($scope, $rootScope, $stateParams, $location, $state, $timeout, $mdMedia, categoryService, productService, pictureService, shoppingCartModel) {
+app.controller('IZIPASSBorneController', function ($scope, $rootScope, $stateParams, $location, $state, $timeout, $mdMedia, categoryService, productService, pictureService) {
     var self = this;
 
     var pouchDBChangedHandler = $rootScope.$on('pouchDBChanged', function (event, args) {
@@ -131,15 +131,4 @@ app.controller('IZIPASSBorneController', function ($scope, $rootScope, $statePar
             $("#allCategories").scrollTo(updatedItemElem);
         }
     };
-
-    $scope.addToCart = function (product) {
-        if (product) {
-            if (!product.DisableBuyButton) {
-                shoppingCartModel.addToCart(product);
-            }
-        } else {
-            console.log("oops, pas de product");
-        }
-    };
-
 });

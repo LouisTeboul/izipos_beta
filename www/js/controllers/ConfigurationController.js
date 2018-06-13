@@ -119,7 +119,7 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
     $scope.emptyCache = function () {
         // Checking if all tickets have already been synchronised with the izibox
         var adapter = !!window.sqlitePlugin ? 'cordova-sqlite' : 'websql';
-        var dbReplicate = new PouchDB('izipos_replicate', {adapter: adapter});
+        var dbReplicate = new PouchDB('izipos_replicate', {size: 50, adapter: adapter});
 
         var deleteCache = function () {
             swal({

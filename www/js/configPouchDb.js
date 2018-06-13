@@ -1,6 +1,7 @@
 ﻿app.configPouchDb = function ($rootScope, $q, zposService, posService) {
 
     if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
+        console.log('Android / iOs Detected');
         document.addEventListener("deviceready", onDeviceReady, false);
     } else {
         onDeviceReady();
@@ -41,10 +42,11 @@
 var setupDatabases = function ($rootScope, $q, zposService, posService, settingsPouchDB) {
     // PouchDB.debug.enable('*');
 
+
     // Instantiate PouchDB
-    $rootScope.dbInstance = new PouchDB('izipos_datas', {adapter: settingsPouchDB.typeDB});
-    $rootScope.dbOrder = new PouchDB('izipos_order', {adapter: settingsPouchDB.typeDB});
-    $rootScope.dbFreeze = new PouchDB('izipos_freeze', {adapter: settingsPouchDB.typeDB});
+    $rootScope.dbInstance = new PouchDB('izipos_datas', {size: 200, adapter: settingsPouchDB.typeDB});
+    $rootScope.dbOrder = new PouchDB('izipos_order', {size: 50, adapter: settingsPouchDB.typeDB});
+    $rootScope.dbFreeze = new PouchDB('izipos_freeze', {size: 50, adapter: settingsPouchDB.typeDB});
 
     console.info("PouchDb adapter : " + $rootScope.dbInstance.adapter); // prints either 'idb' or 'websql'
 
@@ -350,7 +352,7 @@ var setupDatabases = function ($rootScope, $q, zposService, posService, settings
 
     //#region dbReplicate
     $rootScope.InitDBReplicate = function () {
-        $rootScope.dbReplicate = new PouchDB('izipos_replicate', {adapter: settingsPouchDB.typeDB});
+        $rootScope.dbReplicate = new PouchDB('izipos_replicate', {size: 50, adapter: settingsPouchDB.typeDB});
 
         var replicateInfo = undefined;
 
@@ -539,7 +541,7 @@ var setupDatabases = function ($rootScope, $q, zposService, posService, settings
 var syncValidatePoolDb = function ($rootScope,settingsPouchDB) {
     var syncRunning = false;
 
-    $rootScope.dbValidatePool = new PouchDB('izipos_validatepool', {adapter: settingsPouchDB.typeDB});
+    $rootScope.dbValidatePool = new PouchDB('izipos_validatepool', {size: 50, adapter: settingsPouchDB.typeDB});
     if ($rootScope.IziBoxConfiguration.LocalIpIziBox) {
         var urlValidatePoolCouchDb = "http://" + $rootScope.IziBoxConfiguration.LocalIpIziBox + ":5984/validatepool";
         var remoteDbValidatePool = new PouchDB(urlValidatePoolCouchDb);
