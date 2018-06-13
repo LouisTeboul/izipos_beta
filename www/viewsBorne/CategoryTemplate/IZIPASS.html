@@ -5,7 +5,6 @@
         <div ng-repeat="product in products track by $index" flex="20" flex-xs="50" flex-sm="50" flex-md="30" class="caseAttribute ">
             <md-button class="productboxIZIPASS" md-no-ink ng-click="addToCart(product)" layout-fill>
                 <div layout="column" layout-fill>
-
                     <div class="conteneur-images">
                         <img alt="" ng-src="{{product.DefaultPictureUrl}}" class="image">
                     </div>
@@ -22,16 +21,6 @@
                     </div>
 
                     <div class="actionsIZIPASS">
-                        <!--<div class="action" title="Ajouter au panier" ng-if="!product.DisableBuyButton && product.ProductAttributes.length == 0 && !product.EmployeeTypePrice">
-                            <span class="action-text" translate>
-                                Ajouter au ticket
-                            </span>
-                        </div>-->
-                        <!--<div class="action" title="Choisir produit" ng-if="!product.DisableBuyButton && product.ProductAttributes.length > 0 && !product.EmployeeTypePrice">
-                            <span class="action-text" translate>
-                                Choisir produit
-                            </span>
-                        </div>-->
                         <div class="action" title="Saisir le prix" ng-if="!product.DisableBuyButton && product.ProductAttributes.length == 0 && product.EmployeeTypePrice">
                             <span class="action-text" translate>Saisir le prix</span>
                         </div>

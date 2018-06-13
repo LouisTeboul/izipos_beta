@@ -178,7 +178,33 @@ var initLineDisplay = function ($rootScope) {
 
 var initServices = function ($rootScope, $injector) {
 
-    syncValidatePoolDb($rootScope);
+    var settingsPouchDB = {
+        typeDB: "websql",
+        opts: {live: true, retry: true, batch_size: 50, batches_limit: 100, heartbeat: 5000},
+        optsReplicate: {live: true, retry: true, batch_size: 10, batches_limit: 8, heartbeat: 5000},
+        optsSync: {live: false, retry: false, batch_size: 10, batches_limit: 8},
+        // auth: {username: 'posnf', password: 'Izipass2018'}
+    };
+
+    function onDeviceReady() {
+        var adapter = !!window.sqlitePlugin ? 'cordova-sqlite' : 'websql';
+        settingsPouchDB = {
+            typeDB: adapter,
+            opts: {live: true, retry: true, batch_size: 50, batches_limit: 100, heartbeat: 5000},
+            optsReplicate: {live: true, retry: true, batch_size: 10, batches_limit: 8, heartbeat: 5000},
+            optsSync: {live: false, retry: false, batch_size: 10, batches_limit: 8},
+            // auth: {username: 'posnf', password: 'Izipass2018'}
+        };
+        syncValidatePoolDb($rootScope, settingsPouchDB);
+    }
+
+    if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
+        document.addEventListener("deviceready", onDeviceReady, false);
+    } else {
+        onDeviceReady();
+    }
+
+
 
     var zposService = $injector.get('zposService');
     zposService.init();
