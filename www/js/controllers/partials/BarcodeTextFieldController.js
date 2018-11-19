@@ -1,28 +1,28 @@
 app.controller('BarcodeTextFieldController', function ($scope, $rootScope, $uibModal, shoppingCartModel, textFieldService) {
 
-    var txtBarcode;
+    let txtBarcode;
 
     $scope.init = function () {
         txtBarcode = document.getElementById("txtBarcode");
-
         $scope.barcode = shoppingCartModel.getCurrentBarcode();
 
         $rootScope.$on(Keypad.KEY_PRESSED, function (event, data) {
-            if (!textFieldService.getFocusedTextField() && document.getElementsByClassName("modal").length == 0) {
+            if (!textFieldService.getFocusedTextField() && document.querySelectorAll(".modal").length === 0) {
                 $scope.$evalAsync(function () {
                     focusTextField();
                     $scope.barcode.barcodeValue += data;
+
                 });
             }
         });
-
 
         $rootScope.$on(Keypad.MODIFIER_KEY_PRESSED, function (event, data) {
             if (data === "NEXT") {
                 $scope.validTextField(false);
             }
             if (data === "CLEAR") {
-                $scope.barcode.barcodeValue = $scope.barcode.barcodeValue.substring(0, $scope.barcode.barcodeValue.length - 1);
+                //$scope.barcode.barcodeValue = $scope.barcode.barcodeValue.substring(0, $scope.barcode.barcodeValue.length - 1);
+                //FIXME: Appelé de plus en plus de fois ??
                 $scope.$evalAsync();
             }
         });
@@ -34,19 +34,16 @@ app.controller('BarcodeTextFieldController', function ($scope, $rootScope, $uibM
         }
         else {
             focusTextField();
-
-            var location = "end-center";
+            let location = "end-center";
 
             if ($scope.accordionStatus && !$scope.accordionStatus.ticketOpen) {
                 location = "start-center";
             }
-
             $rootScope.openKeyboard("decimal", location);
-            //$rootScope.openKeyboard("decimal", location);
         }
     };
 
-    var focusTextField = function () {
+    const focusTextField = function () {
         if (txtBarcode) {
             txtBarcode.focus();
         }
@@ -58,39 +55,36 @@ app.controller('BarcodeTextFieldController', function ($scope, $rootScope, $uibM
     };
 
     $scope.validTextField = function (scanned) {
-        var result = false;
+        let result = false;
         if ($scope.barcode.barcodeValue) {
-            var barcode = $scope.barcode.barcodeValue.trim();
+            let barcode = $scope.barcode.barcodeValue.trim();
             barcode = barcode.replace(/.+\//, '');
-            var barcodeLength = barcode.length;
+            const barcodeLength = barcode.length;
 
             if (barcodeLength > 0) {
-                if /* Freezed shoppingCart */ (barcode.indexOf("TK") == 0) {
-                    var id = barcode.replace("TK", "");
+                if (barcode.indexOf("TK") === 0) { /* Freezed shoppingCart */
+                    let id = barcode.replace("TK", "");
                     id = parseInt(id);
                     shoppingCartModel.unfreezeShoppingCartById(id);
                     result = true;
-                } else if /* Avoir */ (barcode.indexOf("AV") == 0) {
+                } else if (barcode.indexOf("AV") === 0) { /* Avoir */
                     if (shoppingCartModel.getCurrentShoppingCart()) {
-                        var avoirValues = (atob(barcode.replace("AV", ""))).split("|");
-                        var avoirAmount = parseFloat(avoirValues[1]) / 100;
+                        const avoirValues = (atob(barcode.replace("AV", ""))).split("|");
+                        const avoirAmount = parseFloat(avoirValues[1]) / 100;
                         console.log("Avoir : " + avoirValues + " Montant : " + avoirAmount);
-
-                        var paymentModes = shoppingCartModel.getPaymentModesAvailable();
-                        var avoirPaymentMode = Enumerable.from(paymentModes).firstOrDefault(function (pm) {
+                        const paymentModes = shoppingCartModel.getPaymentModesAvailable();
+                        const avoirPaymentMode = Enumerable.from(paymentModes).firstOrDefault(function (pm) {
                             return pm.PaymentType == PaymentType.AVOIR;
                         });
 
                         if (avoirPaymentMode) {
-                            var paymentByAvoir = clone(avoirPaymentMode);
+                            let paymentByAvoir = clone(avoirPaymentMode);
                             paymentByAvoir.Total = avoirAmount;
                             shoppingCartModel.addPaymentMode(paymentByAvoir);
                         }
                     }
-
                     result = true;
-                } else if /* TicketResto */ (barcodeLength == 24 && !isNaN(barcode)) {
-
+                } else if /* TicketResto */ (barcodeLength === 24 && !isNaN(barcode)) {
                     result = shoppingCartModel.addTicketRestaurant(barcode);
 
                     if (result) {
@@ -101,30 +95,24 @@ app.controller('BarcodeTextFieldController', function ($scope, $rootScope, $uibM
                             $scope.scanBarcode();
                         }
                     }
-
-
-                } else /* Product */ if (barcodeLength == 13 && !isNaN(barcode)) {
+                } else if (barcodeLength === 13 && !isNaN(barcode)) { /* Product */
                     shoppingCartModel.addToCartBySku(barcode);
                     result = true;
-                } else /* Fid */ if ($rootScope.IziBoxConfiguration.UseFID) {
-
-
+                } else if ($rootScope.IziBoxConfiguration.UseFID) { /* Fid */
                     // Si on detecte une carte de fidelité, on verifie si le client a un ticket en attente
                     // Si oui, on le defreeze
-                    if (shoppingCartModel.getCurrentShoppingCart == undefined) {
+                    if (shoppingCartModel.getCurrentShoppingCart === undefined) {
                         shoppingCartModel.unfreezeShoppingCartByBarcode(barcode);
                     } else {
                         shoppingCartModel.getLoyalty(barcode);
                         result = true;
                         $rootScope.closeKeyboard();
                     }
-
                 } else {
                     sweetAlert("Le code à barres n'a pas été reconnu...");
                     $rootScope.closeKeyboard();
                 }
             }
-
             $scope.clearTextField();
         }
         return result;
@@ -141,7 +129,7 @@ app.controller('BarcodeTextFieldController', function ($scope, $rootScope, $uibM
                 }
             );
         } catch (err) {
-            var modalInstance = $uibModal.open({
+            let modalInstance = $uibModal.open({
                 templateUrl: 'modals/modalBarcodeReader.html',
                 controller: 'ModalBarcodeReaderController',
                 backdrop: 'static'

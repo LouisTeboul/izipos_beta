@@ -1,22 +1,24 @@
-app.controller('ModalCashRegisterShoppingCartsController', function ($scope, $rootScope, $uibModalInstance, $uibModal, zposService, shoppingCartService, shoppingCartModel, hid, zpid, ypid, posPeriodService) {
-    var currentFilterAmount = undefined;
-
+app.controller('ModalCashRegisterShoppingCartsController', function ($scope, $rootScope, $uibModalInstance, $uibModal, zposService, shoppingCartService, shoppingCartModel, hid, zpid, ypid) {
+    let currentFilterAmount = undefined;
 
     $scope.init = function () {
         $scope.gridColumns = [
-            {field: "alias", title: "Caisse"},
+            {field: "AliasCaisse", title: "Caisse"},
             {field: "PosUserName", title: "Opérateur"},
             {field: "Date", title: "Date", type: "date", format: "{0:dd/MM/yyyy HH:mm:ss}"},
             {field: "Timestamp", title: "No Ticket", width: 150},
             {field: "TableNumber", title: "Table", width: 80},
             {field: "Total", title: "Total", width: 80},
             {
-                template: "<button class=\"btn btn-default\" ng-click=\"editShopCartItem(dataItem)\"><span class='glyphicon glyphicon-pencil'></span></button>",
+                template: "<button class='btn btn-default' ng-click='editShopCartItem(dataItem)'><span class='glyphicon glyphicon-pencil'></span></button>",
                 title: " ",
                 width: 80
             },
             {
-                template: "<button class=\"btn btn-info\" ng-click=\"printNote(dataItem)\"><img style=\"width:20px;\" alt=\"Image\" src=\"img/receipt.png\"></button><button class=\"btn btn-rose\" style=\"margin-left:5px\" ng-click=\"selectShopCartItem(dataItem)\"><img style=\"width:20px;\" alt=\"Image\" src=\"img/print.png\"></button>",
+                template: "<button class='btn btn-info spaced' ng-click='printNote(dataItem)'>" +
+                    "<img style='width:20px;' alt='Image' src='img/receipt.png'/></button>" +
+                    "<button class='btn btn-rose spaced' ng-click='selectShopCartItem(dataItem)'>" +
+                    "<img style='width:20px;' alt='Image' src='img/print.png'></button>",
                 title: " ",
                 width: 133
             }
@@ -27,15 +29,12 @@ app.controller('ModalCashRegisterShoppingCartsController', function ($scope, $ro
 
         $scope.loadValues(zpid, hid, ypid, currentFilterAmount);
 
-
         // Reload values if amount filtered search
         // On click of a button
         $scope.filterAmountHandler = function () {
             currentFilterAmount = $scope.filterAmount;
             $scope.loadValues(zpid, hid, ypid, currentFilterAmount);
-
         };
-
     };
 
     $scope.displayShoppingCarts = function (shoppingCarts) {
@@ -45,17 +44,10 @@ app.controller('ModalCashRegisterShoppingCartsController', function ($scope, $ro
                 model: {
                     fields: {
                         PosUserName: {type: "string"},
-                        alias: {type: "string"},
+                        AliasCaisse: {type: "string"},
                         Date: {
-                            type: "date", parse: function (e) {
-                                // HACK -> However, JavaScript does work with mm/dd/yyyy format by default.
-                                var res = e.split("/");
-                                var tmp = res[0];
-                                res[0] = res[1];
-                                res[1] = tmp;
-                                e = res.join("/");
-                                var test = Date.parse(e, 'dd/MM/yyyy HH:mm:ss');
-                                return test
+                            type: "date", parse: (d) => {
+                                return moment(d, 'dd/MM/yyyy HH:mm:ss').toDate();
                             }
                         },
                         Timestamp: {type: "string"},
@@ -85,24 +77,14 @@ app.controller('ModalCashRegisterShoppingCartsController', function ($scope, $ro
      */
     $scope.loadValues = function (zpid, hid, ypid, filterAmount) {
         $scope.loading = true;
-        if (!ypid) ypid = {};
 
         // Get shopping cart by Hid ZPid
         zposService.getShoppingCartsByPeriodAsync(zpid, hid, ypid).then(function (shoppingCarts) {
-            if (isNaN(filterAmount) || filterAmount == 0) {
+            if (isNaN(filterAmount) || filterAmount === 0) {
                 $scope.displayShoppingCarts(shoppingCarts);
             } else {
-                var tmpSp = [];
-                Enumerable.from(shoppingCarts).forEach(function (sp, index) {
-                    if (sp.Total == filterAmount) {
-                        tmpSp.push(sp);
-                    }
-
-                    if (index == shoppingCarts.length - 1) {
-                        $scope.displayShoppingCarts(tmpSp);
-                    }
-                })
-
+                let filteredShoppingCarts = shoppingCarts.filter(s => s.Total === filterAmount);
+                $scope.displayShoppingCarts(filteredShoppingCarts);
             }
 
         }, function () {
@@ -135,7 +117,7 @@ app.controller('ModalCashRegisterShoppingCartsController', function ($scope, $ro
      */
     $scope.editShopCartItem = function (selectedShoppingCart) {
         console.log(selectedShoppingCart);
-        var modalInstance = $uibModal.open({
+        let modalInstance = $uibModal.open({
             templateUrl: 'modals/modalEditShoppingCart.html',
             controller: 'ModalEditShoppingCartController',
             resolve: {

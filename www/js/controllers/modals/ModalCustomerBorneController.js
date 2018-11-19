@@ -18,10 +18,10 @@ app.controller('ModalCustomerBorneController', function ($scope, $rootScope, $q,
         $scope.clientSelected = false;
         $scope.registerFull = false;
         $scope.signInSettings = undefined;
+        $scope.pubMail = true;
 
         var settingApi = $rootScope.IziBoxConfiguration.UrlSmartStoreApi + '/RESTLoyalty/RESTLoyalty/getCustomerSettings';
         console.log(settingApi);
-
 
         $http.get(settingApi).success(function (settings) {
             console.log(settings);
@@ -43,6 +43,11 @@ app.controller('ModalCustomerBorneController', function ($scope, $rootScope, $q,
 
         $scope.currentShoppingCart = shoppingCartModel.getCurrentShoppingCart();
         $scope.clientUrl = $rootScope.IziBoxConfiguration.UrlSmartStoreApi.replace("/api", "");
+
+        $scope.customStyle = {
+            'flex-direction' : $rootScope.borne && $rootScope.borneVertical ? 'column' : 'row',
+            'background-image': $rootScope.borneBgModal ? 'url(' + $rootScope.borneBgModal + ')' : 'url(img/fond-borne.jpg)'
+        }
     };
 
     $scope.pageChanged = function () {
@@ -276,7 +281,7 @@ app.controller('ModalCustomerBorneController', function ($scope, $rootScope, $q,
                 $scope.validDisabled = false;
                 ngToast.create({
                     className: 'danger',
-                    content: '<b>Le format de l\'email est incorrect</b>',
+                    content: '<span class="bold">Le format de l\'email est incorrect</span>',
                     dismissOnTimeout: true,
                     timeout: 10000,
                     dismissOnClick: true
@@ -290,7 +295,7 @@ app.controller('ModalCustomerBorneController', function ($scope, $rootScope, $q,
             $scope.validDisabled = false;
             ngToast.create({
                 className: 'danger',
-                content: '<b>Le format du téléphone est incorrect</b>',
+                content: '<span class="bold">Le format du téléphone est incorrect</span>',
                 dismissOnTimeout: true,
                 timeout: 10000,
                 dismissOnClick: true
@@ -303,7 +308,7 @@ app.controller('ModalCustomerBorneController', function ($scope, $rootScope, $q,
             $scope.validDisabled = false;
             ngToast.create({
                 className: 'danger',
-                content: '<b>Le format du code postal est incorrect</b>',
+                content: '<span class="bold">Le format du code postal est incorrect</span>',
                 dismissOnTimeout: true,
                 timeout: 10000,
                 dismissOnClick: true
@@ -387,7 +392,7 @@ app.controller('ModalCustomerBorneController', function ($scope, $rootScope, $q,
                 $scope.validDisabled = false;
                 ngToast.create({
                     className: 'danger',
-                    content: '<b>Veuillez renseigner tout les champs</b>',
+                    content: '<span class="bold">Veuillez renseigner tout les champs</span>',
                     dismissOnTimeout: true,
                     timeout: 10000,
                     dismissOnClick: true
@@ -399,7 +404,7 @@ app.controller('ModalCustomerBorneController', function ($scope, $rootScope, $q,
             $scope.validDisabled = false;
             ngToast.create({
                 className: 'danger',
-                content: '<b>Impossible d\'enregistrer le client</b>',
+                content: '<span class="bold">Impossible d\'enregistrer le client</span>',
                 dismissOnTimeout: true,
                 timeout: 10000,
                 dismissOnClick: true
@@ -410,8 +415,8 @@ app.controller('ModalCustomerBorneController', function ($scope, $rootScope, $q,
 
     $scope.close = function () {
         delete $rootScope.currentPage;
-        var modalInstance = $uibModal.open({
-            templateUrl: 'modals/modalConnection.html',
+        $uibModal.open({
+            templateUrl: 'modals/modalConnectionMode.html',
             controller: 'ModalConnectionController',
             backdrop: 'static',
             keyboard :false,

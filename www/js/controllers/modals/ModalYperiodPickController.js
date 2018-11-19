@@ -24,25 +24,25 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
             //Recupere la liste de tout les HID associés a un tickets dans zpos
             //Il faut recup toutes les caisse associé à une periode Y
             posPeriodService.getAllYPeriodAsync('*').then(function (yp) {
-                var index = -1;
-                Enumerable.from(yp).forEach(function (row) {
+                let index = -1;
+                for(let row of yp) {
                     posService.getPosNameAsync(row.hardwareId).then(function (alias) {
 
-                        if ($scope.model.closingEnable || row.hardwareId == $rootScope.PosLog.HardwareId) {
+                        if ($scope.model.closingEnable || row.hardwareId === $rootScope.PosLog.HardwareId) {
 
-                            var hidExist = Enumerable.from($scope.model.hids).firstOrDefault(function (x) {
-                                return row.hardwareId == x.hid;
+                            const hidExist = Enumerable.from($scope.model.hids).firstOrDefault(function (x) {
+                                return row.hardwareId === x.hid;
                             });
                             if (!hidExist) {
                                 $scope.model.hids.push({hid: row.hardwareId, alias: alias});
                                 index++;
-                                if (row.hardwareId == $rootScope.PosLog.HardwareId) {
+                                if (row.hardwareId === $rootScope.PosLog.HardwareId) {
                                     $scope.setHid(row.hardwareId, index);
                                 }
                             }
                         }
                     });
-                });
+                }
             });
         }).catch(function (err) {
             $scope.isClosingEnabled = false;
@@ -52,8 +52,8 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
 
 
     };
-    var getYperiods = function (hid, currentyPeriod, andClose = false, andShow=false) {
-        if (hid == '*') {
+    const getYperiods = function (hid, currentyPeriod, andClose = false, andShow = false) {
+        if (hid === '*') {
             $scope.model.chosenHid = undefined;
             $scope.model.chosenYpid = undefined;
 
@@ -68,21 +68,20 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
                 dateFormat(ys[0].startDate);
 
                 // Préselectionner du YPeriod Courant :
-                var indexY = -1;
-                Enumerable.from(ys).forEach(function (y) {
-
+                let indexY = -1;
+                for(let y of ys) {
                     indexY++;
-                    if (currentyPeriod && y.id == currentyPeriod.id) {
+                    if (currentyPeriod && y.id === currentyPeriod.id) {
                         $scope.setYPeriod(y, indexY);
                     }
-                });
+                }
             });
         }
     };
 
-    $scope.setHid = function (hid, index, andClose=false, andShow=false) {
+    $scope.setHid = function (hid, index, andClose = false, andShow = false) {
 
-        if ($scope.activeHidBtn != index) {
+        if ($scope.activeHidBtn !== index) {
 
             $scope.activeHidBtn = index;
             $scope.activeYpidBtn = undefined;
@@ -91,7 +90,7 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
             posPeriodService.getYPeriodAsync(hid, undefined, false, false).then(function (currentyPeriod) {
                 getYperiods(hid, currentyPeriod, andClose, andShow);
 
-            }, function (err) {
+            }, function () {
                 getYperiods(hid, undefined, andClose, andShow);
             });
         }
@@ -107,19 +106,15 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
         $scope.activeYpidBtn = index;
         $scope.isZdisabled = yp.isEmpty;
 
-        if (yp == '*') {
+        if (yp === '*') {
             //Si il n'y a aucune periode ouverte pour cette caisse, on empeche la fermeture
-            var atLeastOneOpenPeriod = Enumerable.from($scope.yperiods).firstOrDefault(function (x) {
+            const atLeastOneOpenPeriod = Enumerable.from($scope.yperiods).firstOrDefault(function (x) {
                 return !x.endDate;
             });
-            if (atLeastOneOpenPeriod || $scope.model.closingEnable) {
-                $scope.isClosingEnabled = true;
-            } else {
-                $scope.isClosingEnabled = false;
-            }
+            $scope.isClosingEnabled = !!(atLeastOneOpenPeriod || $scope.model.closingEnable);
             $scope.model.chosenYpid = undefined;
         } else {
-            $scope.isClosingEnabled = yp.endDate ? false : true;
+            $scope.isClosingEnabled = !yp.endDate;
             $scope.model.chosenYpid = yp.yPeriodId;
             //Verifié si la periode contient des ticket,
             //Si non, il faut bloquer l'affichage du Z
@@ -134,9 +129,9 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
          */
 
         //Si on a selectionner toutes les caisses
-        if ($scope.model.chosenHid == undefined || $scope.model.hids.length == 1) {
+        if ($scope.model.chosenHid === undefined || $scope.model.hids.length === 1) {
             //Si on a selectionner toutes les periodes
-            if ($scope.model.chosenYpid == undefined) {
+            if ($scope.model.chosenYpid === undefined) {
                 $scope.model.mode = {idMode: 3, text: "Fermeture de journée", title: "Z de journée"};
                 //Si on a selectionner une periode
             } else {
@@ -145,7 +140,7 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
             //Si on a selectionné une caisse
         } else {
             //Si on a selectionner toutes les periodes
-            if ($scope.model.chosenYpid == undefined) {
+            if ($scope.model.chosenYpid === undefined) {
                 //SI c'est la seul caisse du store, c'est une fermeture journée
                 $scope.model.mode = {idMode: 2, text: "Fermeture de caisse", title: "Z de caisse"};
                 //Si on a selectionner une periode
@@ -161,10 +156,10 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
         $scope.determineMode();
 
         $scope.currentYPeriod = $scope.model.chosenYpid ? Enumerable.from($scope.yperiods).firstOrDefault(function (yP) {
-            return yP.id == $scope.model.chosenYpid;
+            return yP.id === $scope.model.chosenYpid;
         }) : undefined;
 
-        $uibModal.open({
+        $rootScope.modalStatsEnabled = $uibModal.open({
             templateUrl: 'modals/modalStatsPeriod.html',
             controller: 'ModalStatsPeriodController',
             size: 'max',
@@ -183,13 +178,12 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
         });
     };
 
-
     $scope.closePos = function () {
         $uibModalInstance.close();
 
         $scope.determineMode();
         $scope.currentYPeriod = $scope.model.chosenYpid ? Enumerable.from($scope.yperiods).firstOrDefault(function (yP) {
-            return yP.id == $scope.model.chosenYpid;
+            return yP.id === $scope.model.chosenYpid;
         }) : undefined;
 
         $uibModal.open({
@@ -198,7 +192,7 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
             size: 'lg',
             resolve: {
                 closePosParameters: function () {
-                    var closePosParameters = {
+                    return {
                         hid: $scope.model.chosenHid,
                         hidList: $scope.model.hids,
                         mode: $scope.model.mode,
@@ -206,7 +200,6 @@ app.controller('ModalYperiodPickController', function ($scope, $rootScope, $uibM
                         yperiods: $scope.yperiods,
                         zperiod: $scope.zp
                     };
-                    return closePosParameters;
                 },
                 modalStats: function () {
                     return $uibModalInstance

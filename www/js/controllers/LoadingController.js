@@ -10,12 +10,14 @@
  * For displaying the progress bar of data loading from couchdb
  * Plugged to the data loading event
  */
-app.controller('LoadingController', function ($scope, $rootScope, $location, $timeout, $q, $injector, updateService, zposService, settingService, posService, categoryService, borneService) {
+app.controller('LoadingController', function ($scope, $rootScope, $location, $timeout, $q, $injector, $mdMedia, updateService, zposService, settingService, posService, categoryService, borneService) {
+
+    $scope.mdMedia = $mdMedia;
 
     var currencyReady = false;
     // What's the difference with dbReplic below
     $rootScope.$on('dbDatasReplicate', function (event, args) {
-        if (args.status == "Change") {
+        if (args.status === "Change") {
             $scope.$apply(function () {
                 $scope.percentProgress = GetPercentage(args);
                 $scope.loading = true;
@@ -121,7 +123,7 @@ app.controller('LoadingController', function ($scope, $rootScope, $location, $ti
             posService.getPosNameAsync($rootScope.modelPos.hardwareId).then(function (alias) {
                 $rootScope.modelPos.aliasCaisse = alias;
             }).catch(function (err) {
-                console.log(err)
+                console.log(err);
             });
 
             //TODO ? zposService.getPaymentValuesAsync();
@@ -140,6 +142,29 @@ app.controller('LoadingController', function ($scope, $rootScope, $location, $ti
     });
 
 
+    function callback(storage) {
+
+        if ($scope.skip) {
+            if (!$rootScope.init) {
+                console.log($rootScope.storedCategories);
+                $rootScope.init = true;
+                initServices($rootScope, $injector);
+                borneService.redirectToHome();
+            }
+        } else {
+            if (storage.mainProductsCount === 0 && storage.subProductsCount === 0) {
+                $scope.loadingProgress += 1 / $scope.categoriesToLoad.length * 100;
+                $rootScope.storedCategories['' + storage.mainCategory.Id] = storage;
+
+                if ((Math.round($scope.loadingProgress * 100) / 100 === 100 || Object.keys($rootScope.storedCategories).length === $scope.categoriesToLoad.length) && !$rootScope.init) {
+                    $rootScope.init = true;
+                    initServices($rootScope, $injector);
+                    borneService.redirectToHome();
+                }
+            }
+        }
+    }
+
     var checkDbReady = function () {
         if ($rootScope.modelDb &&
             $rootScope.modelDb.configReplicationReady &&
@@ -149,37 +174,39 @@ app.controller('LoadingController', function ($scope, $rootScope, $location, $ti
             $rootScope.modelDb.replicateReady &&
             $rootScope.modelDb.orderReady) {
 
-            $rootScope.modelDb.databaseReady = true;
+            $scope.skip = false;
 
-            categoryService.getCategoriesAsync().then(function (categories) {
-                $rootScope.storedCategories = {};
-                categories = categories.filter(c => c.IsEnabled);
+            if ($rootScope.modelDb.databaseReady) {
+                categoryService.getCategoriesAsync().then(function (categories) {
+                    $scope.message = "Préchargement des catégories ...";
+                    $rootScope.storedCategories = {};
+                    $scope.loadingProgress = 0;
 
-                function callback(storage) {
-                    if (storage.mainProducts === 0 && storage.subProducts === 0) {
-                        //window.localStorage.setItem('Category' + storage.mainCategory.id, JSON.stringify(storage));
-                        $rootScope.storedCategories['' + storage.mainCategory.Id] = storage;
+                    $scope.categoriesToLoad = categories.filter(c => c.IsEnabled);
 
+                    console.log($scope.categoriesToLoad);
 
-                        if (Object.keys($rootScope.storedCategories).length === categories.length && !$rootScope.init) {
-
-                            console.log($rootScope.storedCategories);
-                            $rootScope.init = true;
-                            initServices($rootScope, $injector);
-                            borneService.redirectToHome();
+                    $scope.categoriesToLoad.forEach(function (c) {
+                        /*
+                        if(window.localStorage.getItem('Category' + c.id)){
+                            callback(window.localStorage.getItem('Category' + c.id));
                         }
-                    }
-                }
+                        */
+                        categoryService.loadCategory(c.id, true, callback);
+                    });
 
-                categories.forEach(function (c) {
                     /*
-                    if(window.localStorage.getItem('Category' + c.id)){
-                        callback(window.localStorage.getItem('Category' + c.id));
-                    }
-                    */
-                    categoryService.loadCategory(c.id, callback);
+                    if(!$rootScope.init) {
+                        $rootScope.init= true;
+                        initServices($rootScope, $injector);
+                        borneService.redirectToHome();
+                    }*/
+                }, function (err) {
+                    console.log(err);
                 });
-            });
+            } else {
+                $rootScope.modelDb.databaseReady = true;
+            }
 
             /*
             if (!$rootScope.init) {
@@ -193,10 +220,17 @@ app.controller('LoadingController', function ($scope, $rootScope, $location, $ti
         }
     };
 
-
     $scope.init = function () {
         if ($rootScope.borne) {
             $rootScope.IziBoxConfiguration.LoginRequired = false;
+
+            // Lance le démon de télécollecte seulement si on est en mode borne et qu'on a un tpa
+            if(window.iziBoxSetup) {
+                window.iziBoxSetup.init(JSON.stringify(config));
+                if (window.tpaPayment) {
+                    posService.startTelecolDaemon();
+                }
+            }
         }
         //CouchDb
         app.configPouchDb($rootScope, $q, zposService, posService);
@@ -215,6 +249,12 @@ app.controller('LoadingController', function ($scope, $rootScope, $location, $ti
             console.log("Loading : init db ready");
             next();
         }
+    };
+
+    $scope.skipCategoryLoading = function () {
+        $scope.skip = true;
+        
+        callback(null);
     };
 
     var initGauges = function () {

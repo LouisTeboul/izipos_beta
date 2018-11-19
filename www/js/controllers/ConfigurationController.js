@@ -10,7 +10,7 @@
         })
 });
 
-app.controller('ConfigurationController', function ($scope, $rootScope, $location, $http, $uibModal, shoppingCartService, posLogService, posService) {
+app.controller('ConfigurationController', function ($scope, $rootScope, $location, $http, $uibModal, shoppingCartService, posLogService, posService, ipService) {
     var current = this;
     var userPresetIndex = 1;
     //var portraitRatioHandler = undefined;
@@ -30,7 +30,45 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
     });
 
     $scope.init = function () {
-        $rootScope.borne = false;
+
+        $rootScope.tenantColor = "#98C8CC";
+
+        if(window.localStorage.getItem("IsBorneDefault") ) {
+            $rootScope.borne = window.localStorage.getItem("IsBorneDefault") === "true";
+        }
+        if(window.localStorage.getItem("IsBorneAtCashierDefault") ) {
+            $rootScope.borneAtCashier = window.localStorage.getItem("IsBorneAtCashierDefault") === "true";
+        }
+        if(window.localStorage.getItem("IsBorneEasyTransacDefault") ) {
+            $rootScope.borneEasyTransac = window.localStorage.getItem("IsBorneEasyTransacDefault") === "true";
+        }
+        if(window.localStorage.getItem("IsBorneBalanceDefault") ) {
+            $rootScope.borneBalance = window.localStorage.getItem("IsBorneBalanceDefault") === "true";
+        }
+        if(window.localStorage.getItem("IsBorneCBDefault") ) {
+            $rootScope.borneCB = window.localStorage.getItem("IsBorneCBDefault") === "true";
+        }
+        if(window.localStorage.getItem("IsBorneVerticalDefault") ) {
+            $rootScope.borneVertical = window.localStorage.getItem("IsBorneVerticalDefault") === "true";
+        }
+
+        $rootScope.$watch('borne', function () {
+            if($rootScope.IziBoxConfiguration) {
+                $rootScope.IziBoxConfiguration.defaultStoreId = $rootScope.IziBoxConfiguration.StoreId;
+                if($rootScope.borne) {
+                    if($rootScope.IziBoxConfiguration.StoreBorneId) {
+                        console.log("StoreId changed : " + $rootScope.IziBoxConfiguration.StoreId + " => " + $rootScope.IziBoxConfiguration.StoreBorneId);
+                        $rootScope.IziBoxConfiguration.StoreId = $rootScope.IziBoxConfiguration.StoreBorneId;
+                    }
+                } else {
+                    console.log("StoreId changed : " + $rootScope.IziBoxConfiguration.StoreId + " => " + $rootScope.IziBoxConfiguration.defaultStoreId);
+                    $rootScope.IziBoxConfiguration.StoreId = $rootScope.IziBoxConfiguration.defaultStoreId;
+                }
+            }
+        });
+
+        $rootScope.isPMREnabled = false;
+        $rootScope.isCustomerLog = false;
         $scope.Model = {};
         $scope.presetList = [];
         $scope.selectedPresetTitle = "";
@@ -76,6 +114,10 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
             $rootScope.modelPos.hardwareId = result;
 
         });
+        ipService.getLocalIpAsync().then(function (ip) {
+            $rootScope.modelPos.localIp = ip.local;
+        });
+
 
         // For developpement
         if ($location.$$path == "/restart") {
@@ -119,7 +161,7 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
     $scope.emptyCache = function () {
         // Checking if all tickets have already been synchronised with the izibox
         var adapter = !!window.sqlitePlugin ? 'cordova-sqlite' : 'websql';
-        var dbReplicate = new PouchDB('izipos_replicate', {size: 50, adapter: adapter});
+        var dbReplicate = new PouchDB('izipos_replicate', { adapter: adapter});
 
         var deleteCache = function () {
             swal({
@@ -139,9 +181,16 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
                     } else {
                         try {
                             // FIXME: Windows cache is not always available
-                            window.cache.clear(function () {
-                                $scope.reset();
-                            });
+                            if(window.cache) {
+                                window.cache.clear(function () {
+                                    $scope.reset();
+                                });
+                            } else if($rootScope.deviceReady && window.CacheClear) {
+                                window.CacheClear( () => {
+                                    $scope.reset();
+                                });
+                            }
+
                         } catch (err) {
                             console.log(err);
                         }
@@ -277,7 +326,9 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
                 Value: $scope.currentPreset.value
             };
 
-            $http.post(presetApiUrl, presetPostData, {timeout: 1000});
+            $http.post(presetApiUrl, presetPostData, {timeout: 1000}).then( () => {
+                $scope.fetchUserPresets();
+            });
 
         }, function () {
         });
@@ -412,13 +463,26 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
      * Print  the printer id
      * @param idx The printers id
      */
+
     $scope.testPrinter = function (idx) {
+
         shoppingCartService.testPrinterAsync(idx).then(function (res) {
             sweetAlert("Printer ok !");
         }, function (err) {
             sweetAlert("Printer error !");
         });
     };
+
+    $scope.testBornePrinter = function (idx) {
+        if($rootScope.borne) {
+            shoppingCartService.testPrinterAsync(idx, $rootScope.modelPos.localIp).then(function (res) {
+                sweetAlert("Printer ok !");
+            }, function (err) {
+                sweetAlert("Printer error !");
+            });
+        }
+    };
+
 
     /**
      * Store the user preferences
@@ -429,6 +493,14 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
         if ($scope.currentPreset) {
             $rootScope.UserPreset = $scope.currentPreset.value.settings;
         }
+        window.localStorage.setItem("IsBorneDefault", $rootScope.borne ? $rootScope.borne.toString() : false);
+
+        window.localStorage.setItem("IsBorneAtCashierDefault", $rootScope.borneAtCashier ? $rootScope.borneAtCashier.toString() : false);
+        window.localStorage.setItem("IsBorneEasyTransacDefault", $rootScope.borneEasyTransac ? $rootScope.borneEasyTransac.toString() : false);
+        window.localStorage.setItem("IsBorneBalanceDefault", $rootScope.borneBalance ? $rootScope.borneBalance.toString() : false);
+        window.localStorage.setItem("IsBorneCBDefault", $rootScope.borneCB ? $rootScope.borneCB.toString() : false);
+
+        window.localStorage.setItem("IsBorneVerticalDefault", $rootScope.borneVertical ? $rootScope.borneVertical.toString() : false);
         window.localStorage.setItem("PosNumber", $rootScope.modelPos.posNumber);
         window.localStorage.setItem("POSPrinter", $rootScope.PrinterConfiguration.POSPrinter);
         window.localStorage.setItem("ProdPrinter", $rootScope.PrinterConfiguration.ProdPrinter);
@@ -507,8 +579,14 @@ app.controller('ConfigurationController', function ($scope, $rootScope, $locatio
 
         $http.get(configApiUrl, {timeout: 10000}).success(function (data, status, headers, config) {
             $rootScope.IziBoxConfiguration = data;
+
             if ($rootScope.borne) {
                 $rootScope.IziBoxConfiguration.LoginRequired = false;
+                if($rootScope.IziBoxConfiguration.StoreBorneId) {
+                    $rootScope.IziBoxConfiguration.defaultStoreId = $rootScope.IziBoxConfiguration.StoreId;
+                    console.log("StoreId changed : " + $rootScope.IziBoxConfiguration.StoreId + " => " + $rootScope.IziBoxConfiguration.StoreBorneId);
+                    $rootScope.IziBoxConfiguration.StoreId = $rootScope.IziBoxConfiguration.StoreBorneId;
+                }
             }
             data.WithoutIzibox = true;
             data.UseProdPrinter = false;

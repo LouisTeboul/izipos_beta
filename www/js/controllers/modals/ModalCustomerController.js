@@ -1,10 +1,6 @@
-/**
- * Modal available if we have the forcedeliverytype parameters enabled
- * The POS user should select a valid delivery mode before validating the ticket
- */
 app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $http, $timeout, $uibModalInstance, $uibModal, shoppingCartService, loyaltyService, ngToast, shoppingCartModel, $translate) {
 
-    var current = this;
+    let current = this;
     $scope.registerOperation = "getEmail"; // for display
 
     $rootScope.currentPage = 1;
@@ -25,7 +21,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
         $scope.deliveryType = shoppingCartModel.getDeliveryType();
 
 
-        var settingApi = $rootScope.IziBoxConfiguration.UrlSmartStoreApi + '/RESTLoyalty/RESTLoyalty/getCustomerSettings';
+        let settingApi = $rootScope.IziBoxConfiguration.UrlSmartStoreApi + '/RESTLoyalty/RESTLoyalty/getCustomerSettings';
         console.log(settingApi);
 
 
@@ -87,8 +83,8 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
     };
 
 
-    $scope.editDeliveryAddress = function(){
-        var modalInstance = $uibModal.open({
+    $scope.editDeliveryAddress = function () {
+        let modalInstance = $uibModal.open({
             templateUrl: 'modals/modalPromptDeliveryAddress.html',
             controller: 'ModalPromptDeliveryAddressController',
             resolve: {
@@ -143,9 +139,9 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
             $rootScope.showLoading();
 
             //Si le mode de consommation = a emporté ou livré
-            if($scope.deliveryType !== 0){
+            if ($scope.deliveryType !== 0) {
                 /**Proposer de renseigner une adresse de livraison */
-                var modalInstance = $uibModal.open({
+                let modalInstance = $uibModal.open({
                     templateUrl: 'modals/modalPromptDeliveryAddress.html',
                     controller: 'ModalPromptDeliveryAddressController',
                     resolve: {
@@ -207,10 +203,9 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
     };
 
     $scope.validEmail = function (strEmail) {
-        if(strEmail){
-            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            var myResult = re.test(strEmail);
-            return myResult;
+        if (strEmail) {
+            const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(strEmail);
         } else {
             return false;
         }
@@ -218,15 +213,15 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
     };
 
     $scope.validPhone = function (strPhone) {
-        if(strPhone){
-            var reFrance = /^0[1-9][0-9]{8}$/;
-            var resultFrance = reFrance.test(strPhone);
+        if (strPhone) {
+            const reFrance = /^0[1-9][0-9]{8}$/;
+            const resultFrance = reFrance.test(strPhone);
 
             //Numero de telephone canadien.
             // Indicatif entre parenthese facultatif
             // Separateur soit : rien, espace, ou tiret.
-            var reCanada = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-            var resultCanada = reCanada.test(strPhone);
+            const reCanada = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+            const resultCanada = reCanada.test(strPhone);
             return (resultCanada || resultFrance);
         } else {
             return false;
@@ -235,13 +230,13 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
 
 
     $scope.validZipPostCode = function (strZip) {
-        if(strZip){
-            var reFrance = /^[0-9]{5}$/;
-            var resultFrance = reFrance.test(strZip);
+        if (strZip) {
+            const reFrance = /^[0-9]{5}$/;
+            const resultFrance = reFrance.test(strZip);
 
             //Post Code canadien, avec espace facultatif
-            var reCanada = /[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ] ?[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]/;
-            var resultCanada = reCanada.test(strZip.toUpperCase());
+            const reCanada = /[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ] ?[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]/;
+            const resultCanada = reCanada.test(strZip.toUpperCase());
             return (resultCanada || resultFrance);
         } else {
             return false;
@@ -263,7 +258,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
                 }
             );
         } catch (err) {
-            var modalInstance = $uibModal.open({
+            let modalInstance = $uibModal.open({
                 templateUrl: 'modals/modalBarcodeReader.html',
                 controller: 'ModalBarcodeReaderController',
                 backdrop: 'static'
@@ -278,12 +273,13 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
     };
 
     $scope.setBarcodeFocus = function () {
-        var test = document.getElementById("txtBarcodeCustomer");
+        let test = document.getElementById("txtBarcodeCustomer");
         test.focus();
 
     };
 
     $scope.changeOperation = function (strOperation) {
+        $scope.registerFull = false;
         $scope.registerOperation = strOperation;
 
         //Put the focus in the barcode input for a direct scan
@@ -323,7 +319,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
             if (!$scope.validEmail($scope.newLoyalty.CustomerEmail) && $scope.registerFull) {
                 ngToast.create({
                     className: 'danger',
-                    content: '<b>Le format de l\'email est incorrect</b>',
+                    content: '<span class="bold">Le format de l\'email est incorrect</span>',
                     dismissOnTimeout: true,
                     timeout: 10000,
                     dismissOnClick: true
@@ -336,7 +332,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
         if ($scope.signInSettings.Phone && !$scope.validPhone($scope.newLoyalty.CustomerPhone) && $scope.registerFull) {
             ngToast.create({
                 className: 'danger',
-                content: '<b>Le format du téléphone est incorrect</b>',
+                content: '<span class="bold">Le format du téléphone est incorrect</span>',
                 dismissOnTimeout: true,
                 timeout: 10000,
                 dismissOnClick: true
@@ -348,7 +344,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
         if ($scope.signInSettings.ZipPostalCode && !$scope.validZipPostCode($scope.newLoyalty.CustomerZipPostalCode) && $scope.registerFull) {
             ngToast.create({
                 className: 'danger',
-                content: '<b>Le format du code postal est incorrect</b>',
+                content: '<span class="bold">Le format du code postal est incorrect</span>',
                 dismissOnTimeout: true,
                 timeout: 10000,
                 dismissOnClick: true
@@ -358,7 +354,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
         }
 
         // Get the current Shopping Cart
-        var curShoppingCart = shoppingCartModel.getCurrentShoppingCart();
+        let curShoppingCart = shoppingCartModel.getCurrentShoppingCart();
 
         if (curShoppingCart == undefined) {
             shoppingCartModel.createShoppingCart();
@@ -374,16 +370,18 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
                     // On verifie si le champs du formulaire qui lui est associé est valide
                     // Si non, la methode retourne false
                     try {
-                        Enumerable.from($scope.signInSettings).forEach(function (field) {
+                        for(let field of $scope.signInSettings) {
                             //Si le champs est requis
                             if (field.value == true) {
                                 //On verifie si le champs est renseigné
                                 //Validation ?
-                                if (!$scope.newLoyalty["Customer" + field.key] || $scope.newLoyalty["Customer" + field.key] == "" || $scope.newLoyalty["Customer" + field.key].length == 0) {
+                                if (!$scope.newLoyalty["Customer" + field.key]
+                                    || $scope.newLoyalty["Customer" + field.key] == ""
+                                    || $scope.newLoyalty["Customer" + field.key].length == 0) {
                                     throw 0;
                                 }
                             }
-                        });
+                        }
                         $scope.validDisabled = false;
                         return true;
                     }
@@ -430,7 +428,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
                             $scope.validDisabled = false;
                             ngToast.create({
                                 className: 'danger',
-                                content: '<b>Veuillez renseigner tout les champs</b>',
+                                content: '<span class="bold">Veuillez renseigner tout les champs</span>',
                                 dismissOnTimeout: true,
                                 timeout: 10000,
                                 dismissOnClick: true
@@ -439,7 +437,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
 
 
                         }
-                    }, function(err){
+                    }, function () {
                         swal($translate.instant("Une erreur s'est produite !"));
                         $scope.validDisabled = false;
                     });
@@ -513,7 +511,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
                 $scope.validDisabled = false;
                 ngToast.create({
                     className: 'danger',
-                    content: '<b>Impossible d\'enregistrer le client</b>',
+                    content: '<span class="bold">Impossible d\'enregistrer le client</span>',
                     dismissOnTimeout: true,
                     timeout: 10000,
                     dismissOnClick: true
@@ -539,9 +537,6 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
             $scope.validDisabled = false;
             $uibModalInstance.close();
         }
-
-        return;
-
     };
 
     $scope.close = function () {
@@ -552,34 +547,94 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
     //-------------------------------------------------------------------------Fid----------------------------------------------------------------------------------
 
     $scope.containsBalanceType = function (balanceType) {
-        var ret = false;
+        let ret = false;
 
-        if ($scope.currentShoppingCart && $scope.currentShoppingCart.customerLoyalty && $scope.currentShoppingCart.customerLoyalty.Balances && $scope.currentShoppingCart.customerLoyalty.Balances.length > 0) {
+        if ($scope.currentShoppingCart && $scope.currentShoppingCart.customerLoyalty
+            && $scope.currentShoppingCart.customerLoyalty.Balances
+            && $scope.currentShoppingCart.customerLoyalty.Balances.length > 0) {
             ret = Enumerable.from($scope.currentShoppingCart.customerLoyalty.Balances).any(function (balance) {
                 return balance.BalanceType == balanceType;
             });
         }
-
         return ret;
     };
+
+    $scope.getUseToPay = function () {
+        let ret = false;
+
+        if ($scope.currentShoppingCart && $scope.currentShoppingCart.customerLoyalty
+            && $scope.currentShoppingCart.customerLoyalty.Balances
+            && $scope.currentShoppingCart.customerLoyalty.Balances.length > 0) {
+            ret = Enumerable.from($scope.currentShoppingCart.customerLoyalty.Balances).firstOrDefault(function (balance) {
+                return balance.UseToPay === true;
+            });
+        }
+        return ret;
+    };
+
 
     $scope.getDate = function (date) {
         return new Date(date);
     };
 
     $scope.getTotalPositiveHistory = function (history, balance) {
-        var total = 0;
-        for (var i = 0; i < history.length; i++) {
+        let total = 0;
+        for (let i = 0; i < history.length; i++) {
             total += history[i].Value > 0 && history[i].BalanceType_Id == balance.BalanceType_Id ? history[i].Value : 0;
         }
         return balance.UseToPay ? roundValue(total) : total;
+    };
+
+    $scope.creditBalance = function () {
+        let balance = $scope.getUseToPay();
+        if (balance && $scope.currentShoppingCart.Barcode) {
+
+            let modalInstance = $uibModal.open({
+                templateUrl: 'modals/modalAddToBalance.html',
+                controller: 'ModalAddToBalanceController',
+                backdrop: 'static'
+            });
+
+            modalInstance.result.then(function (amountToCredit) {
+                let amountToCreditStr = amountToCredit.toString().replace(",", ".");
+                //Contruire l'URL avec les parametres
+                let urlAPIFid = $rootScope.IziBoxConfiguration.UrlSmartStoreApi + "/RESTLoyalty/RESTLoyalty/AddBalanceCredit"
+                    + "?barCodeClient=" + $scope.currentShoppingCart.Barcode
+                    + "&balanceId=" + balance.Id
+                    // On encode le montant, qui peut etre decimal
+                    + "&amountToCredit=" + amountToCreditStr;
+
+                $http.post(urlAPIFid).then((res) => {
+                    swal({
+                        title: $translate.instant("Credit"),
+                        text: $translate.instant("Client crédité !"),
+                        type: "success",
+                        confirmButtonColor: "#74d866",
+                        confirmButtonText: $translate.instant("Ok"),
+                        closeOnConfirm: true
+                    });
+                    console.log(res);
+                }, (err) => {
+                    swal({
+                        title: $translate.instant("Credit"),
+                        text: $translate.instant("Echec du credit !"),
+                        type: "warning",
+                        showCancelButton: false,
+                        confirmButtonColor: "#74d866",
+                        confirmButtonText: $translate.instant("Ok"),
+                        closeOnConfirm: true,
+                    });
+                    console.log(err);
+                })
+            });
+        }
     };
 
     //[WARNING] -> La caisse ne peut pas utiliser le addpassage il est géré à l'intégration du ticket 
     $scope.addPassage = function () {
         $scope.isAddingPassage = true;
         var passageObj = createEmptyPassageObj();
-        loyaltyService.addPassageAsync(passageObj).then(function (res) {
+        loyaltyService.addPassageAsync(passageObj).then(function () {
             customAlert($translate.instant("Un passage a été ajouté"));
         });
     };
@@ -590,18 +645,19 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
     };
 
 
-    //[OBSOLETE]
+    /**
+     @Deprecated
+     */
     $scope.useAction = function (isTiles) {
         var amount = $('#orderAmountInput').val();
         // If the amount is mandatory
         if ($scope.currentShoppingCart.customerLoyalty.CustomActionMandatoryAmount && (amount == null || amount == undefined || amount === "")) {
             customAlert($translate.instant("Veuillez saisir") + " " + ($scope.currentShoppingCart.customerLoyalty.OneRuleWithOrderAmountString ? $scope.currentShoppingCart.customerLoyalty.OneRuleWithOrderAmountString : $translate.instant("Montant d'achat")));
-        }
-        else {
+        } else {
             $scope.isUsingAction = true;
             customConfirm($translate.instant("Voulez-vous effectuer cette action ?"), "", function (isAccept) {
                 if (isAccept) {
-                    var passageObj = createEmptyPassageObj();
+                    let passageObj = createEmptyPassageObj();
                     if (amount != null && amount != undefined && amount != "") {
                         passageObj.OrderTotalIncludeTaxes = amount;
                         passageObj.OrderTotalExcludeTaxes = amount;
@@ -628,7 +684,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
 
     };
 
-    var customAlert = function (newTitle, newText, callback) {
+    const customAlert = function (newTitle, newText, callback) {
         swal({
             title: newTitle,
             text: newText,
@@ -640,7 +696,7 @@ app.controller('ModalCustomerController', function ($scope, $rootScope, $q, $htt
         }, callback);
     };
 
-    var customConfirm = function (newTitle, newText, callback) {
+    const customConfirm = function (newTitle, newText, callback) {
         swal({
             title: newTitle,
             text: newText,

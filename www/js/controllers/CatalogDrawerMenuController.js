@@ -2,13 +2,13 @@
     $scope.closable = false;
     $scope.authService = authService;
     $scope.docToSynchronize = 0;
-    $scope.phoneOrderEnable = $rootScope.IziBoxConfiguration.PhoneOrderEnable && $rootScope.UserPreset && $rootScope.UserPreset.PhoneOrder && $rootScope.UserPreset.PhoneOrder.Menu;
+    $scope.OrderButtonEnabled = $rootScope.IziBoxConfiguration.PhoneOrderEnable || ($rootScope.UserPreset && $rootScope.UserPreset.PhoneOrder && $rootScope.UserPreset.PhoneOrder.Menu);
 
     $scope.init = function () {
 
         var btnMenus = document.getElementsByClassName("btn-menu-closable");
 
-        for (i = 0; i < btnMenus.length; i++) {
+        for (let i = 0; i < btnMenus.length; i++) {
             var btn = btnMenus[i];
             btn.onclick = function () {
                 $scope.closeDrawerMenu();
@@ -195,8 +195,9 @@
                                 return {
                                     isOpenPos: false,
                                     zPeriodId: yPeriod.zPeriodId,
-                                    yPeriodId: yPeriod.id
-                                }
+                                    yPeriodId: yPeriod.id,
+                                    yPeriod: yPeriod
+                                };
                             }
                         },
                         backdrop: 'static'
@@ -273,6 +274,10 @@
         });
     };
     */
+
+    $scope.openConfig = function() {
+        window.location.reload();
+    };
 
     $scope.openDeviceMonitoring = function () {
         var modalInstance = $uibModal.open({

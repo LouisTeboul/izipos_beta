@@ -13,14 +13,12 @@
                 //Get products for this category
                 productService.getProductForCategoryAsync(categoryId).then(function (results) {
                     if (results) {
-
                         $scope.products = clone(Enumerable.from(results).orderBy('x => x.ProductCategory.DisplayOrder').toArray());
-
-                        Enumerable.from($scope.products).forEach(function (p) {
-                            var offerPrice = offerOneProductInCategory.OfferParam.Price;
+                        for (let p of $scope.products) {
+                            const offerPrice = offerOneProductInCategory.OfferParam.Price;
                             p.Price = offerPrice > p.Price ? p.Price : offerPrice;
                             pictureService.getPictureIdsForProductAsync(p.Id).then(function (ids) {
-                                var id = Enumerable.from(ids).firstOrDefault();
+                                const id = pictureService.getCorrectPictureId(ids);
                                 pictureService.getPictureUrlAsync(id).then(function (url) {
                                     if (!url) {
                                         url = 'img/photo-non-disponible.png';
@@ -28,7 +26,7 @@
                                     p.DefaultPictureUrl = url;
                                 });
                             });
-                        });
+                        }
                     }
 
                 }, function (err) {

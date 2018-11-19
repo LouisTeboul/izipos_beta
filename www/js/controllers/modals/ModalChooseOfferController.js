@@ -12,12 +12,18 @@ app.controller('ModalChooseOfferController', function ($scope, $rootScope, $uibM
 
     $scope.submitItem = function () {
 
-        if (shoppingCartModel.getCurrentShoppingCart().Discounts.length == 0) {
+        let currentShoppingCart = shoppingCartModel.getCurrentShoppingCart();
+
+        if (currentShoppingCart.Discounts.length === 0) {
             $scope.result.type = "item";
-            if ($scope.result.action.localeCompare('Offer') != 0) {
+            if ($scope.result.action.localeCompare('Offer') !== 0) {
                 $scope.result.montant = Number(document.querySelector('#txtAmount').textContent);
             }
             $rootScope.closeKeyboard();
+            // Check if the user has already selected payments modes
+            if (currentShoppingCart.PaymentModes && currentShoppingCart.PaymentModes.length > 0) {
+                shoppingCartModel.removeAllPayments();
+            }
             $uibModalInstance.close($scope.result);
         } else {
             $rootScope.closeKeyboard();
@@ -28,12 +34,18 @@ app.controller('ModalChooseOfferController', function ($scope, $rootScope, $uibM
 
     $scope.submitLine = function () {
 
-        if (shoppingCartModel.getCurrentShoppingCart().Discounts.length == 0) {
+        let currentShoppingCart = shoppingCartModel.getCurrentShoppingCart();
+
+        if (currentShoppingCart.Discounts.length === 0) {
             $scope.result.type = "line";
-            if ($scope.result.action.localeCompare('Offer') != 0) {
+            if ($scope.result.action.localeCompare('Offer') !== 0) {
                 $scope.result.montant = Number(document.querySelector('#txtAmount').textContent);
             }
             $rootScope.closeKeyboard();
+            // Check if the user has already selected payments modes
+            if (currentShoppingCart.PaymentModes && currentShoppingCart.PaymentModes.length > 0) {
+                shoppingCartModel.removeAllPayments();
+            }
             $uibModalInstance.close($scope.result);
         } else {
             $rootScope.closeKeyboard();
@@ -44,7 +56,7 @@ app.controller('ModalChooseOfferController', function ($scope, $rootScope, $uibM
 
     $scope.setFocus = function () {
 
-        var focus = setTimeout(function () {
+        setTimeout(function () {
             if (document.querySelector('#txtAmount')) {
                 document.querySelector('#txtAmount').focus();
                 $rootScope.openKeyboard('decimal', "end-start");
@@ -53,10 +65,7 @@ app.controller('ModalChooseOfferController', function ($scope, $rootScope, $uibM
     };
 
     $scope.isMode = function () {
-        if ($scope.mode)
-            return false;
-        else
-            return true;
+        return !$scope.mode;
     };
 
     $scope.cancel = function () {

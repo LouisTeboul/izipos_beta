@@ -19,7 +19,7 @@
 });
 
 
-app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stateParams, $location, categoryService, settingService, productService, pictureService, shoppingCartModel) {
+app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stateParams, $location, $mdMedia, categoryService, settingService, productService, pictureService, shoppingCartModel) {
     var deliveryType = shoppingCartModel.getDeliveryType();
     $rootScope.$on('deliveryTypeChanged', (e, newValue) => {
         var nextDeliveryType = newValue;
@@ -46,6 +46,7 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
 
     });
     $scope.init = function () {
+        $scope.$mdMedia = $mdMedia;
         if ($rootScope.IziBoxConfiguration.StepEnabled) {
             settingService.getStepNamesAsync().then(function (stepNames) {
                 $scope.stepNames = stepNames;
@@ -139,14 +140,13 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
         $scope.productIsValid();
 
         //Load selected value
-        Enumerable.from($scope.product.ProductAttributes).forEach(function (pAttr) {
-            var pAttrId = pAttr.Id;
-            Enumerable.from(pAttr.ProductAttributeValues).forEach(function (pAttrValue) {
-
+        for (let pAttr of $scope.product.ProductAttributes) {
+            let pAttrId = pAttr.Id;
+            for (let pAttrValue of pAttr.ProductAttributeValues) {
                 //Load pictures for attributes values
                 if (!pAttrValue.DefaultPictureUrl) {
                     pictureService.getPictureIdsForProductAsync(pAttrValue.LinkedProductId).then(function (ids) {
-                        var id = Enumerable.from(ids).firstOrDefault();
+                        const id = pictureService.getCorrectPictureId(ids);
                         pictureService.getPictureUrlAsync(id).then(function (url) {
                             if (!url) {
                                 url = 'img/photo-non-disponible.png';
@@ -161,8 +161,8 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
                     pAttrValue.Selected = false;
                     $scope.selectAttributeValue(pAttrId, pAttrValue.Id, true);
                 }
-            });
-        });
+            }
+        }
     };
 
     //#region Actions
@@ -181,8 +181,7 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
 
     // Select (unselect) Attribute value
     $scope.selectAttributeValue = function (productAttributeId, id, reload, event) {
-
-        var Attribute = Enumerable.from($scope.product.ProductAttributes).firstOrDefault("x => x.Id ==" + productAttributeId);
+        let Attribute = Enumerable.from($scope.product.ProductAttributes).firstOrDefault("x => x.Id ==" + productAttributeId);
 
         if (!reload) {
             if (shoppingCartModel.getCurrentShoppingCart()) {
@@ -191,39 +190,33 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
             else {
                 Attribute.Step = 0;
             }
-
         }
+        let AttributeValue = Enumerable.from(Attribute.ProductAttributeValues).firstOrDefault("x => x.Id ==" + id);
 
-        var AttributeValue = Enumerable.from(Attribute.ProductAttributeValues).firstOrDefault("x => x.Id ==" + id);
         if (AttributeValue.Selected) {
-            if (Attribute.IsRequired == false) {
-                if ($rootScope.borne) {
-                    AttributeValue.Selected = false;
-                    if (AttributeValue.PriceAdjustment) {
-                        $scope.TotalPrice -= AttributeValue.PriceAdjustment;
-                    }
-                } else {
-                    if (Attribute.Type == 3) {
-                        if (testSelectCheckbox(Attribute, AttributeValue, false)) {
-                            if (AttributeValue.PriceAdjustment) $scope.TotalPrice -= AttributeValue.PriceAdjustment;
-                        }
-                    }
+            if (testSelectCheckbox(Attribute, AttributeValue, false)) {
+                if (AttributeValue.PriceAdjustment) {
+                    $scope.TotalPrice -= AttributeValue.PriceAdjustment;
                 }
             }
         } else {
             if ($rootScope.borne) {
                 AttributeValue.Selected = true;
+
                 if (!reload) {
                     Attribute.Step = $scope.currentStep;
 
                     if (AttributeValue.LinkedProduct && AttributeValue.LinkedProduct.ProductComments && AttributeValue.LinkedProduct.ProductComments.length > 0) {
                         shoppingCartModel.editComment(AttributeValue);
                     }
-
                 } else {
-                    if (!Attribute.Step) Attribute.Step = $scope.currentStep;
+                    if (!Attribute.Step) {
+                        Attribute.Step = $scope.currentStep;
+                    }
                 }
-                if (AttributeValue.PriceAdjustment) $scope.TotalPrice += AttributeValue.PriceAdjustment;
+                if (AttributeValue.PriceAdjustment) {
+                    $scope.TotalPrice += AttributeValue.PriceAdjustment;
+                }
                 $scope.$evalAsync();
             } else {
                 if (testSelectCheckbox(Attribute, AttributeValue, true)) {
@@ -233,61 +226,62 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
                         if (AttributeValue.LinkedProduct && AttributeValue.LinkedProduct.ProductComments && AttributeValue.LinkedProduct.ProductComments.length > 0) {
                             shoppingCartModel.editComment(AttributeValue);
                         }
-
+                    } else {
+                        if (!Attribute.Step) {
+                            Attribute.Step = $scope.currentStep;
+                        }
                     }
-                    else {
-                        if (!Attribute.Step) Attribute.Step = $scope.currentStep;
+                    if (AttributeValue.PriceAdjustment) {
+                        $scope.TotalPrice += AttributeValue.PriceAdjustment;
                     }
-                    if (AttributeValue.PriceAdjustment) $scope.TotalPrice += AttributeValue.PriceAdjustment;
                     $scope.$evalAsync();
                 }
             }
         }
-
         if (Attribute.Type == 2) // Radiolist
         {
-            for (var i = 0; i < Attribute.ProductAttributeValues.length; i++) {
-                var item = Attribute.ProductAttributeValues[i];
+            for (let i = 0; i < Attribute.ProductAttributeValues.length; i++) {
+                let item = Attribute.ProductAttributeValues[i];
                 if (item.Selected && item.Id != id) {
                     item.Selected = false;
                     $scope.TotalPrice -= item.PriceAdjustment;
                 }
             }
         }
-
         $scope.product.Price = $scope.TotalPrice;
         $scope.productIsValid();
         $scope.$evalAsync();
     };
 
     function testSelectCheckbox(Attribute, AttributeValue, state) {
-        if (Attribute.Type == 3) { // Checkbox
+        if (Attribute.Type != 2) { // Checkbox
 
             //A faire descendre du BO, mais pour l'instant c'est en dur
-            var max = Attribute.Max ? Attribute.Max : 99;
-            var min = Attribute.Min ? Attribute.Min : 0;
+            const max = Attribute.Max ? Attribute.Max : 99;
+            const min = Attribute.Min ? Attribute.Min : 0;
             // Pas besoin d'un min ?
 
             // On recupere le container de l'element cliqué
-            var container = document.querySelector("#a" + Attribute.Id);
+            let container = document.querySelector("#a" + Attribute.Id);
 
             // On regarde le nombre d'element selectionné dans le container
-            var nbSelect = container.querySelectorAll("button.attributeBox.active").length;
+            let nbSelect = container.querySelectorAll("button.attributeBox.active").length;
 
             // Si on veut selectionné et qu'on est en dessous du max, on autorise
             if (nbSelect < max && state === true) {
                 AttributeValue.Selected = state;
                 return true;
             }
-
             // Si on veut déselectionné et qu'on est au dessus du min, on autorise
             if (nbSelect > min && state === false) {
-                AttributeValue.Selected = state;
-                return true
+                if (Attribute.IsRequired && nbSelect === 0) {
+                    return false;
+                } else {
+                    AttributeValue.Selected = state;
+                    return true;
+                }
             }
-
             return false;
-
         } else {
             // Dans le cas radio, on autorise
             AttributeValue.Selected = state;
@@ -309,11 +303,13 @@ app.controller('ConfigurableMenuController', function ($scope, $rootScope, $stat
         $scope.canAddToCart = retval;
     };
 
-
     $scope.scrollTo = function (elementId) {
-        var updatedItemElem = document.getElementById('a' + elementId);
-        if (updatedItemElem) {
-            $("#attributes").scrollTo(updatedItemElem);
+        const elem = document.querySelector('#a' + elementId);
+        if (elem) {
+            const top = elem.offsetTop;
+            $('#attributes').animate({
+                scrollTop: top - 40
+            }, 200);
         }
     };
 });

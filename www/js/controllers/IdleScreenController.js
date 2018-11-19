@@ -6,16 +6,16 @@
         })
 });
 
-
-app.controller('IdleScreenController', function ($scope, $rootScope, $location, $q, borneService) {
-    var current = this;
+app.controller('IdleScreenController', function ($scope, $rootScope, $location, $q, $mdMedia,borneService) {
+    let current = this;
+    $scope.mdMedia = $mdMedia;
 
     $scope.init = function () {
-        var el = document.getElementsByClassName("keyboardContainer")[0];
+        let el = document.querySelector(".keyboardContainer");
         el.style.display = "none";
     };
 
     $scope.disableIdle = function () {
         borneService.redirectToHome();
-    }
+    };
 });

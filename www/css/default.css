@@ -59,6 +59,11 @@
 }
 
 @font-face {
+    font-family: 'SignikaNegative-Bold';
+    src: url('fonts/SignikaNegative-Bold.ttf') format('truetype');
+}
+
+@font-face {
     font-family: 'LEDCalculator';
     src: url('fonts/LEDCalculator.ttf') format('truetype');
 }
@@ -68,13 +73,22 @@
 /*-----------------------DEFAULTS-------------------------*/
 
 * {
+    -webkit-user-select: none;
     user-select: none;
+}
+
+html, body {
+    /* position: fixed !important; */
 }
 
 body {
     background-color: #FAFAFA !important;
-    font-family: SignikaNegative-Regular;
+    font-family: SignikaNegative-Regular, sans-serif;
     font-size: 15px;
+    /*
+    height: 100% !important;
+    width : 100% !important;
+    */
 }
 
 h1 {
@@ -94,7 +108,7 @@ hr {
 }
 
 button, html, input, select, textarea {
-    font-family: SignikaNegative-Regular !important;
+    font-family: SignikaNegative-Regular, sans-serif !important;
 }
 
 label {
@@ -102,7 +116,7 @@ label {
 }
 
 .glyphicon {
-    font-family: 'Glyphicons Halflings' !important;
+    font-family: 'Glyphicons Halflings', sans-serif !important;
 }
 
 .center {
@@ -135,6 +149,11 @@ label {
     position: relative;
 }
 
+.loadingMessage {
+    text-align: center;
+    padding: 20px 0 10px;
+}
+
 input:focus, textarea:focus {
     outline: none;
 }
@@ -158,7 +177,7 @@ text-field.flexbox div {
 
 md-progress-linear {
     display: block;
-    position: absolute !important;
+    position: absolute;
     width: 100%;
     height: 5px;
     padding-top: 0 !important;
@@ -173,6 +192,10 @@ md-input-container label:not(._md-container-ignore) {
     left: 0;
     top: -45px;
     right: auto;
+}
+
+.bold {
+    font-family: "SignikaNegative-Bold", sans-serif !important;
 }
 
 .configuration {
@@ -197,7 +220,7 @@ md-input-container label:not(._md-container-ignore) {
 .loading .gaugeValue {
     width: 150px;
     position: relative;
-    font-weight: bold;
+    font-family: "SignikaNegative-Bold", sans-serif !important;
 }
 
 .gaugeWrap {
@@ -206,13 +229,16 @@ md-input-container label:not(._md-container-ignore) {
 
 @media (min-width: 800px) {
 
+    .loadingTitle {
+        font-size: 36px;
+    }
+
     .loading .gaugeValue {
         bottom: 100px;
         font-size: 15px;
     }
 
     .gaugeWrap {
-        width: auto;
         margin-top: 100px;
     }
 
@@ -221,12 +247,34 @@ md-input-container label:not(._md-container-ignore) {
         width: 150px;
         margin: 0 20px;
     }
+
     .loading .gauge {
         margin-left: -75px;
+    }
+
+    .loadingMessage {
+        font-size: 20px;
+    }
+
+    .configRow .value.special {
+        min-width: 250px;
     }
 }
 
 @media (max-width: 799px) {
+
+    .configRow .value.special {
+        min-width: 100px;
+    }
+
+    .loadingMessage {
+        font-size: 14px;
+    }
+
+    .loadingTitle {
+        font-size: 20px;
+    }
+
     .configuration {
         zoom: 70%;
     }
@@ -236,14 +284,13 @@ md-input-container label:not(._md-container-ignore) {
     }
 
     .gaugeWrap {
-        width: 240px;
-        margin-top: 50px;
+        margin-top: 0;
     }
 
     .loading .gaugeContainer {
         height: 75px;
         width: 100px;
-        margin: 25px 10px;
+        margin: 10px 0;
     }
 
     .loading .gaugeContainer .gauge {
@@ -264,9 +311,13 @@ md-input-container label:not(._md-container-ignore) {
 }
 
 .configRow {
-    min-height: 30px;
-    padding-top: 0px;
-    padding-bottom: 0px;
+    min-height: 26px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.configRow.special {
+    border-bottom: 1px solid #C2C2C2;
 }
 
 .configRow .title {
@@ -275,6 +326,10 @@ md-input-container label:not(._md-container-ignore) {
 
 .configRow .value {
     text-align: center;
+}
+
+.configRow .value.special md-switch {
+    margin:10px 0;
 }
 
 .configRow .uib-dropdown-menu .menuItemLink {
@@ -302,7 +357,7 @@ md-input-container label:not(._md-container-ignore) {
 
 .attributesPanelInfos .title {
     font-size: 16px;
-    font-weight: bold;
+    font-family: "SignikaNegative-Bold", sans-serif !important;
     white-space: nowrap;
     letter-spacing: 1px;
 }
@@ -326,17 +381,42 @@ md-input-container label:not(._md-container-ignore) {
 .btn-orange {
     background: #ec971f !important;
     color: #fff !important;
-    font-weight: bold !important;
+    font-weight: normal !important;
+    font-family: "SignikaNegative-Bold", sans-serif !important;
 }
 
 .btn-green {
     background: #5cb85c !important;
     color: #fff !important;
-    font-weight: bold !important;
+    font-weight: normal !important;
+    font-family: "SignikaNegative-Bold", sans-serif !important;
 }
 
 .btn-rose {
     background: #d83448 !important;
     color: #fff !important;
-    font-weight: bold !important;
+    font-weight: normal !important;
+    font-family: "SignikaNegative-Bold", sans-serif !important;
+
+}
+
+.tfCommentProduct {
+    width: 510px;
+    margin-right: 10px;
+    min-height: 34px;
+}
+
+.productIPDisabled img {
+    filter: brightness(0.7);
+}
+
+.logoConfig {
+    pointer-events: none;
+    width: 70px;
+    height: 70px;
+}
+
+.imgLogoHeader.smallCatalogLogo {
+    pointer-events: none;
+    max-width: 100px;
 }
