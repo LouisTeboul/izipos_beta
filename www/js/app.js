@@ -40,7 +40,7 @@ app.run(function ($rootScope, $location, $q, $http, ipService, zposService, posP
     try {
         angularLocation = $location;
 
-        $rootScope.Version = "3.0.4.11141";
+        $rootScope.Version = "3.0.4.11191";
         $rootScope.adminMode = {state: false};
         $rootScope.loading = 0;
 

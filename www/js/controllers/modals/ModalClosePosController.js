@@ -693,12 +693,6 @@
             }, function () {
                 const yperiodId = closePosParameters.yperiod ? $scope.closePosParameters.yperiod.id : null;
 
-                const periodRequest = {
-                    ZperiodId: closePosParameters.zperiod.id,
-                    YperiodId: yperiodId
-                };
-
-
                 let printMode = null;
                 if (yperiodId) {
                     printMode = StatsPrintMode.Y;
@@ -706,7 +700,6 @@
                     printMode = StatsPrintMode.Z;
                 }
 
-                const periodStatsApiUrl = "http://" + $rootScope.IziBoxConfiguration.LocalIpIziBox + ":" + $rootScope.IziBoxConfiguration.RestPort + "/zpos/getPeriodStats";
 
                 shoppingCartModel.clearShoppingCart();
 
@@ -719,18 +712,11 @@
                             return hidModel.hid == $scope.closePosParameters.hid;
                         });
 
-                        posPeriodService.closeYPeriodAsync($scope.closePosParameters.yperiod, hardwareIdModel.CashMovementLines, $scope.model.emptyCash).then(function (yPeriodRet) {
+                        posPeriodService.closeYPeriodAsync($scope.closePosParameters.yperiod, hardwareIdModel.CashMovementLines, $scope.model.emptyCash).then(function (statsAfterClose) {
 
                             // Impression du récap :
-                            $http.post(periodStatsApiUrl, periodRequest).then((statsAfterClose) => {
-                                const closingTicketHtml = zposService.composeStatsHTML(statsAfterClose.data, printMode, $scope.model.hardwareIdModels, false);
-                                zposService.printZPosAsync(closingTicketHtml);
-
-                            }, function (err) {
-                                const message = $translate.instant("Erreur lors de la récupération des données");
-                                sweetAlert({ title: message }, function () {
-                                });
-                            });
+                            const closingTicketHtml = zposService.composeStatsHTML(statsAfterClose, printMode, $scope.model.hardwareIdModels, false);
+                            zposService.printZPosAsync(closingTicketHtml);
 
                             // Si vider le cash, création d'un mouvement fermeture
                             emptyCashYperiod(hardwareIdModel.CashMovementLines);
@@ -753,18 +739,11 @@
                             let hardwareIdModel = Enumerable.from($scope.model.hardwareIdModels).firstOrDefault(function (hidModel) {
                                 return hidModel.hid == $scope.closePosParameters.hid;
                             });
-                            posPeriodService.closeYPeriodAsync(yPeriod, hardwareIdModel.CashMovementLines, $scope.model.emptyCash).then(function (yPeriodRet) {
+                            posPeriodService.closeYPeriodAsync(yPeriod, hardwareIdModel.CashMovementLines, $scope.model.emptyCash).then(function (statsAfterClose) {
 
                                 // Impression du récap :
-                                $http.post(periodStatsApiUrl, periodRequest).then((statsAfterClose) => {
-                                    const closingTicketHtml = zposService.composeStatsHTML(statsAfterClose.data, printMode, $scope.model.hardwareIdModels, false);
-                                    zposService.printZPosAsync(closingTicketHtml);
-
-                                }, function (err) {
-                                    const message = $translate.instant("Erreur lors de la récupération des données");
-                                    sweetAlert({ title: message }, function () {
-                                    });
-                                });
+                                const closingTicketHtml = zposService.composeStatsHTML(statsAfterClose, printMode, $scope.model.hardwareIdModels, false);
+                                zposService.printZPosAsync(closingTicketHtml);
 
                                 // Si vider le cash, création d'un mouvement fermeture
                                 emptyCashYperiod(hardwareIdModel.CashMovementLines);
@@ -785,18 +764,11 @@
                         // zposService.saveZArchive( $rootScope.IziBoxConfiguration.StoreId + "_" + stats.data.DateStart + "_" + new Date().getTime(), stats.data, closingTicketHtml);
 
                         // Fermeture de la période
-                        posPeriodService.closeZPeriodAsync($scope.closePosParameters.zperiod).then(function (zPeriodRet) {
+                        posPeriodService.closeZPeriodAsync($scope.closePosParameters.zperiod).then(function (statsAfterClose) {
 
                             // Impression du récap :
-                            $http.post(periodStatsApiUrl, periodRequest).then((statsAfterClose) => {
-                                const closingTicketHtml = zposService.composeStatsHTML(statsAfterClose.data, printMode, $scope.model.hardwareIdModels, false);
-                                zposService.printZPosAsync(closingTicketHtml);
-
-                            }, function (err) {
-                                const message = $translate.instant("Erreur lors de la récupération des données");
-                                sweetAlert({ title: message }, function () {
-                                });
-                            });
+                            const closingTicketHtml = zposService.composeStatsHTML(statsAfterClose, printMode, $scope.model.hardwareIdModels, false);
+                            zposService.printZPosAsync(closingTicketHtml);
 
                             // Pour chaque caisse faire envoyer au BO les valeurs saisie lors de la fermeture
                             for (let hidModel of $scope.model.hardwareIdModels) {
